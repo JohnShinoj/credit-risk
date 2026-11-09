@@ -1,0 +1,15 @@
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated data (recreated by notebooks/01_clean_split.ipynb from Kaggle)
+data/
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
