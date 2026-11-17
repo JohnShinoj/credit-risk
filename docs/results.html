@@ -49,9 +49,19 @@ SMOTE never improves F1. For rates, all five regressors are within 0.02 R² of e
 <figure><img src="figures/test_rate_scatter.png" alt="Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates." loading="lazy"><figcaption>Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates.</figcaption></figure>
 
 <h2>Do the rates look real? (World Bank check)</h2>
-<p>Every loan rate = a <b>benchmark</b> (the economy's base rate) + a <b>premium</b> for the borrower's risk. Using the US prime
-lending rate from the World Bank API, the benchmark is 3.86% (average over the years that fit the data; the data has no dates).
+<div class="card">
+<p><b>Benchmark (the baseline rate).</b> The interest rate that banks charge their <i>safest</i> customers at a given time; it
+moves with the economy (when the central bank raises rates, every loan gets more expensive). We use the <b>US prime lending
+rate</b> from the World Bank API. The data has no loan dates, so we use its average over the years that fit the data:
+<b>3.86%</b>.</p>
+<p><b>Premium.</b> The extra a borrower pays <i>on top of</i> the benchmark for their own risk:
+<b>premium = interest rate − benchmark</b>. Example: a 7.3% loan when the benchmark is 3.86% has a premium of
+7.3 − 3.86 ≈ <b>3.4 percentage points (pp)</b>.</p>
+<p style="margin-bottom:0"><b>"Above the benchmark"</b> means the premium is positive: the borrower pays more than the safest
+customers. In real risk-based lending every borrower should be above the benchmark, and riskier borrowers further above it.
+Comparing premiums instead of raw rates removes the effect of the economy, so only the pricing of risk is left.
 Details in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a>.</p>
+</div>
 <figure><img src="figures/macro_context.png" alt="US prime rate and inflation (World Bank) with each grade's average rate. Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible." loading="lazy"><figcaption>US prime rate and inflation (World Bank) with each grade's average rate. Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible.</figcaption></figure>
 <div class="grid two">
 <figure><img src="figures/pipelineA_premium_vs_actual.png" alt="Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade." loading="lazy"><figcaption>Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade.</figcaption></figure>
