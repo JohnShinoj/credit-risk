@@ -56,6 +56,23 @@ so a model may only use them if they would really be known when the prediction i
 <div class="card kpi"><span class="tag A">Pipeline A</span><div class="v">0.837 · R² 0.907</div><div class="l">default F1 · interest-rate R²<br>rate error ±0.99 pp</div></div>
 <div class="card kpi"><span class="tag B">Pipeline B</span><div class="v">0.699 · R² 0.305</div><div class="l">default F1 · interest-rate R²<br>rate error ±2.70 pp</div></div>
 </div>
+<div class="card">
+<h3 style="margin-top:0">How to read these numbers</h3>
+<ul style="margin-bottom:0">
+<li><b>F1</b> (default, 0 to 1, higher is better): how well the model catches defaulters <i>without</i> wrongly declining good
+customers. It balances <i>precision</i> (of those declined, the share who really default) and <i>recall</i> (of all defaulters,
+the share caught).</li>
+<li><b>Brier score</b> (default, 0 to 1, lower is better): how accurate the predicted probability of default is, the average of
+(predicted probability − what happened)², where what happened is 1 for a default and 0 for repaid. A PD of 0.9 for someone who
+defaults is a small error (0.01); a PD of 0.1 for them is a large one (0.81). Guessing the average default rate (0.219) for
+everyone scores 0.171.</li>
+<li><b>R²</b> (interest rate, 0 to 1, higher is better): the share of the differences in interest rates between borrowers that the
+model explains. R² = 0.9 means 90% is explained; R² = 0 is no better than giving everyone the average rate.</li>
+<li><b>± pp</b> (interest rate): the typical error of the suggested rate (RMSE) in percentage points, e.g. ±2.70 pp means a
+suggestion of 11% is typically off by about 2.7 points.</li>
+<li><b>ROC-AUC</b> (default, 0.5 to 1): how well risky applicants are ranked above safe ones; 0.5 is random.</li>
+</ul>
+</div>
 <div class="note good"><b>Main finding.</b> The lender's grade carries almost all the useful information. Knowing only the grade
 (Pipeline A) predicts default as well as knowing grade and rate together, and explains 91% of the variation in rates. For a
 newcomer without a grade (Pipeline B), default prediction drops to F1 0.70 and only 30% of rate variation can be explained:
