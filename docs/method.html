@@ -11,7 +11,12 @@
 <main>
 
 <h1>Method</h1>
-<p class="lead">How the data is prepared, why, and which models were compared, for default prediction and for interest-rate prediction.</p>
+<p class="lead">How the data is prepared, why, and which models were compared, for default prediction and for interest-rate prediction.</p><div class="note"><b>The three settings compared on this site</b> (they differ only in what is known when the
+decision is made):<br>
+<span class="tag ref">Reference</span> a loan that is <b>already priced</b>: the lender's grade and interest rate are both known.<br>
+<span class="tag A">Pipeline A</span> a <b>graded applicant</b>: the lender has assigned a grade (A–G), the interest rate is not set yet.<br>
+<span class="tag B">Pipeline B</span> a <b>newcomer</b>: no grade and no rate, only what the applicant tells us.<br>
+<a href="index.html#why-three">Why we compare all three →</a></div>
 
 <h2>Preprocessing, and why</h2>
 <div class="table-wrap"><table>
