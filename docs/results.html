@@ -35,9 +35,58 @@ decision is made):<br>
 <tr><td><b>Rate R²</b> test (validation)</td><td>-</td><td class="num"><b>0.907</b> (0.905)</td><td class="num"><b>0.305</b> (0.305)</td></tr>
 <tr><td>Rate error (RMSE)</td><td>-</td><td class="num">±0.99 pp</td><td class="num">±2.70 pp</td></tr>
 </table></div>
-<p>Baselines: "everyone repays" F1 = 0 (accuracy 0.781); PD = 0.219 for everyone gives Brier 0.171; the average rate for
-everyone gives RMSE 3.24 pp, R² = 0. The A and B intervals do not overlap: the gap between them is real, not noise.</p>
+<h3>Baselines: what if we used no model?</h3>
+<p>A score only means something next to the simplest possible answer:</p>
+<div class="table-wrap"><table>
+<tr><th>Baseline</th><th>Result</th><th>Why</th><th>Our models</th></tr>
+<tr><td>Say "everyone repays"</td><td class="num">accuracy 0.781, F1 0</td><td>78.1% of test applicants repaid, so this is "right"
+78% of the time, but it catches <b>no</b> defaulter. This is why we use F1, not accuracy.</td><td class="num">F1 0.70–0.84</td></tr>
+<tr><td>Give everyone PD 0.219 (the average default rate)</td><td class="num">Brier 0.171</td><td>Every repayer is off by 0.219,
+every defaulter by 0.781: 0.219 × 0.781 = 0.171.</td><td class="num">Brier 0.052–0.086</td></tr>
+<tr><td>Give everyone the average rate</td><td class="num">RMSE 3.24 pp, R² 0</td><td>This is just the natural spread of rates.</td>
+<td class="num">±0.99 pp (A), ±2.70 pp (B)</td></tr>
+</table></div>
+
+<h3>95% intervals: is the gap between A and B real?</h3>
+<p>The test set is one sample of 6,482 applicants; another sample would give slightly different scores. To measure this we used
+a <b>bootstrap</b>: draw 6,482 applicants from the test set <i>with replacement</i> (some appear twice, some not at all),
+recompute F1, and repeat 1,000 times. The middle 95% of those values is the interval. Pipeline A's lowest plausible F1 (0.821) is
+well above Pipeline B's highest (0.719), so <b>the intervals do not overlap and the gap is real, not luck</b>: the grade really
+helps. Reference (0.823–0.853) and A overlap almost completely, so knowing the rate on top of the grade adds nothing measurable.</p>
+
+<h3>Confusion matrices and reliability diagram</h3>
 <figure><img src="figures/test_confusion_reliability.png" alt="Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data)." loading="lazy"><figcaption>Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data).</figcaption></figure>
+<p><b>How to read a confusion matrix.</b> Rows are what actually happened, columns are the model's decision at its frozen cutoff;
+"% of row" is the share of that actual group.</p>
+<div class="table-wrap"><table>
+<tr><th></th><th>predicted repay (approve)</th><th>predicted default (decline)</th></tr>
+<tr><td><b>repaid</b></td><td>correct: good customer approved</td><td>error: good customer wrongly declined (lost business)</td></tr>
+<tr><td><b>defaulted</b></td><td>error: defaulter approved (lost money)</td><td>correct: defaulter declined</td></tr>
+</table></div>
+<div class="table-wrap"><table>
+<tr><th>Test set (1,418 defaulters, 5,064 repaid)</th><th><span class="tag ref">Reference</span></th><th><span class="tag A">Pipeline A</span></th><th><span class="tag B">Pipeline B</span></th></tr>
+<tr><td>Defaulters caught (recall)</td><td class="num">1,060 / 1,418 = 74.8%</td><td class="num">1,054 / 1,418 = 74.3%</td><td class="num">864 / 1,418 = 60.9%</td></tr>
+<tr><td>Declined who really defaulted (precision)</td><td class="num">1,060 / 1,112 = 95.3%</td><td class="num">1,054 / 1,102 = 95.6%</td><td class="num">864 / 1,054 = 82.0%</td></tr>
+<tr><td>Good customers wrongly declined</td><td class="num">52 (1.0%)</td><td class="num">48 (0.9%)</td><td class="num">190 (3.8%)</td></tr>
+<tr><td>Defaulters approved</td><td class="num">358</td><td class="num">364</td><td class="num">554</td></tr>
+<tr><td><b>Default rate among approved</b> (21.9% with no model)</td><td class="num">358 / 5,370 = 6.7%</td><td class="num">364 / 5,380 = 6.8%</td><td class="num">554 / 5,428 = 10.2%</td></tr>
+</table></div>
+<ul>
+<li>All three decline a similar number (about 17%), so about 83% are approved.</li>
+<li>With the grade, 96% of declines are real defaulters, and the default rate among approved applicants falls from 21.9% to 6.8%.</li>
+<li>Without the grade (Pipeline B), the model wrongly declines <b>four times as many good customers</b> (190 vs 48) and approves
+about 190 more defaulters, because without the credit history it cannot tell them apart as well.</li>
+<li>The missed defaulters are mostly applicants who look safe (homeowners, small loans, high income): see
+<a href="analysis.html">Result analysis</a>, finding 5.</li>
+</ul>
+<p><b>How to read the reliability diagram.</b> The test applicants are sorted by predicted PD and split into 10 equal groups
+(about 650 each). Each dot is one group: x = its average predicted PD, y = the share who actually defaulted. On the dotted diagonal,
+predicted = actual. All three pipelines lie on it; the <b>ECE</b> (average distance from the diagonal, weighted by group size) is
+only 0.005 / 0.007 / 0.013, so a PD can be read as a real probability. Most dots sit below 0.25 or near 0.9: the forests are
+confident about most applicants. Pipeline B has a dot at 0.45, a group it is unsure about (and indeed 47% of them defaulted).</p>
+<div class="note"><b>Calibrated is not the same as accurate.</b> Pipeline B's probabilities are as honest as A's (both on the
+diagonal), but they are less sharp: more applicants get uncertain middle PDs. That is why B's F1 is lower and its Brier score is
+higher (Brier rewards both honesty and sharpness).</div>
 
 <h2>Every model compared (validation, interactive)</h2>
 <p>Pick a task and a metric. These are 5-fold cross-validation scores on the training set (the test set was not used to choose).</p>
