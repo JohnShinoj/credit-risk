@@ -1,14 +1,20 @@
 inputs,model,RMSE,RMSE sd,MAE,R2,seconds
-PD only,Linear regression,3.1666,0.0254,2.6337,0.0455,15
-PD only,Ridge (alpha=10),3.1666,0.0254,2.6338,0.0455,0
-PD only,Lasso (alpha=0.00215),3.1666,0.0253,2.6338,0.0455,0
-PD only,Random Forest regressor,3.0976,0.0258,2.5544,0.0867,10
-details only (no PD),Linear regression,2.7429,0.0303,2.2009,0.2838,0
-details only (no PD),Ridge (alpha=10),2.7429,0.0302,2.2008,0.2838,0
-details only (no PD),Lasso (alpha=0.00215),2.743,0.03,2.2009,0.2838,1
-details only (no PD),Random Forest regressor,2.7114,0.0316,2.1721,0.3002,9
-PD + details,Mean rate (no model),3.2415,0.0148,2.6941,-0.0002,0
-PD + details,Linear regression,2.7355,0.0331,2.1982,0.2877,0
-PD + details,Ridge (alpha=10),2.7355,0.033,2.1981,0.2877,0
-PD + details,Lasso (alpha=0.00215),2.7355,0.0328,2.198,0.2877,1
-PD + details,Random Forest regressor,2.7022,0.0318,2.1672,0.3049,10
+PD only,Linear regression,3.1666,0.0254,2.6337,0.0455,9.0
+PD only,Ridge (alpha=10),3.1666,0.0254,2.6338,0.0455,0.0
+PD only,Lasso (alpha=0.00215),3.1666,0.0253,2.6338,0.0455,0.0
+PD only,Random Forest regressor,3.0976,0.0258,2.5544,0.0867,6.0
+PD only,Gradient boosting regressor,3.088,0.0266,2.5488,0.0923,1.0
+details only (no PD),Linear regression,2.7429,0.0303,2.2009,0.2838,0.0
+details only (no PD),Ridge (alpha=10),2.7429,0.0302,2.2008,0.2838,0.0
+details only (no PD),Lasso (alpha=0.00215),2.743,0.03,2.2009,0.2838,1.0
+details only (no PD),Random Forest regressor,2.7114,0.0316,2.1721,0.3002,5.0
+details only (no PD),Gradient boosting regressor,2.7134,0.0308,2.1742,0.2991,2.0
+PD + details,Mean rate (no model),3.2415,0.0148,2.6941,-0.0002,0.0
+PD + details,Linear regression,2.7355,0.0331,2.1982,0.2877,0.0
+PD + details,Ridge (alpha=10),2.7355,0.033,2.1981,0.2877,0.0
+PD + details,Lasso (alpha=0.00215),2.7355,0.0328,2.198,0.2877,0.0
+PD + details,Random Forest regressor,2.7022,0.0318,2.1672,0.3049,7.0
+PD + details,Gradient boosting regressor,2.7062,0.0323,2.17,0.3028,2.0
+PD + details + predicted grade,Linear regression,2.7087,0.0322,2.1712,0.3016,
+PD + details + predicted grade,Random Forest regressor,2.7054,0.0309,2.1699,0.3032,
+PD + details + predicted grade,Gradient boosting regressor,2.7095,0.0302,2.1719,0.3012,

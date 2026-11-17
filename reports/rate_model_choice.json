@@ -23,7 +23,15 @@
     "max_depth": 10
   },
   "rf_n_estimators": 300,
+  "hgb_params": {
+    "min_samples_leaf": 50,
+    "max_leaf_nodes": 15,
+    "max_iter": 200,
+    "learning_rate": 0.05,
+    "l2_regularization": 1.0
+  },
   "cv_rmse": 2.702180549804529,
   "cv_r2": 0.30490851606301517,
-  "pd_cutoff": 0.3883119947573823
+  "pd_cutoff": 0.3883119947573823,
+  "two_stage": null
 }

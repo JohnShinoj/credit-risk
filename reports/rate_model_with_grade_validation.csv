@@ -3,13 +3,16 @@ grade only,Linear regression,1.0092,0.0134,0.7918,0.903
 grade only,Ridge (alpha=0.001),1.0092,0.0134,0.7918,0.903
 grade only,Lasso (alpha=0.000215),1.0092,0.0134,0.7916,0.903
 grade only,Random Forest regressor,1.0092,0.0134,0.7918,0.903
+grade only,Gradient boosting regressor,1.0093,0.0134,0.7914,0.903
 grade + details,Linear regression,1.0075,0.0134,0.7915,0.9033
 grade + details,Ridge (alpha=0.001),1.0075,0.0134,0.7915,0.9033
 grade + details,Lasso (alpha=0.000215),1.0075,0.0134,0.7913,0.9033
 grade + details,Random Forest regressor,0.9968,0.0143,0.7833,0.9054
+grade + details,Gradient boosting regressor,0.998,0.0131,0.7835,0.9052
 grade + details + PD,Mean rate (no model),3.2415,0.0148,2.6941,-0.0002
 grade + details + PD,Linear regression,1.0076,0.0134,0.7916,0.9033
 grade + details + PD,Ridge (alpha=0.001),1.0076,0.0134,0.7916,0.9033
 grade + details + PD,Lasso (alpha=0.000215),1.0075,0.0134,0.7914,0.9033
 grade + details + PD,Random Forest regressor,0.9989,0.0141,0.7861,0.905
+grade + details + PD,Gradient boosting regressor,0.998,0.0125,0.7836,0.9051
 NO grade: PD + details (notebook 07),Random Forest regressor,2.7022,,,0.3049

@@ -23,6 +23,13 @@
     "max_depth": 20
   },
   "rf_n_estimators": 300,
+  "hgb_params": {
+    "min_samples_leaf": 20,
+    "max_leaf_nodes": 31,
+    "max_iter": 200,
+    "learning_rate": 0.03,
+    "l2_regularization": 1.0
+  },
   "cv_rmse": 0.9967946434165345,
   "cv_r2": 0.9053795264870764,
   "pipeline": "A (graded applicant)",

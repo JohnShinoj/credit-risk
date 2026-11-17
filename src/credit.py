@@ -51,7 +51,7 @@ def make_preprocess(num_cols=NUM_COLS, cat_cols=CAT_COLS):
         ("num", Pipeline([("impute", SimpleImputer(strategy="median")),
                           ("scale", StandardScaler())]), list(num_cols)),
         ("cat", OneHotEncoder(handle_unknown="ignore"), list(cat_cols)),
-    ])
+    ], sparse_threshold=0)   # always dense (gradient boosting needs dense input; values are identical)
 
 
 def make_pipeline(model, use_smote=False, num_cols=NUM_COLS, cat_cols=CAT_COLS):
