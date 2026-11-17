@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overview | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html" class=active>Overview</a><a href="data.html">Data</a><a href="method.html">Method</a><a href="evaluation.html">Evaluation</a><a href="results.html">Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Who will default, and what interest rate should they pay?</h1>
+<p class="lead">Predicting loan default and suggesting a risk-based interest rate, and measuring how much the answer depends on
+what the lender already knows about the applicant.</p>
+
+<div class="card">
+<h3 style="margin-top:0">The two research questions</h3>
+<ol>
+<li><b>Default:</b> given what is known about a loan applicant, how likely are they to default? We predict a calibrated
+<b>probability of default (PD)</b> for every applicant and decline those above a cutoff.</li>
+<li><b>Interest rate:</b> for applicants who are approved, what interest rate fits their risk?</li>
+</ol>
+<p style="margin-bottom:0"><b>Unit:</b> one row = one loan applicant (one loan). <b>Targets:</b> <code>loan_status</code>
+(1 = defaulted, 0 = repaid) and <code>loan_int_rate</code> (% per year).</p>
+</div>
+
+<h2>Three settings: what is known at decision time?</h2>
+<p>The dataset contains the lender's <b>grade</b> (A–G) and the <b>interest rate</b>. Both are decided <i>by the lender</i>,
+so a model may only use them if they would really be known when the prediction is made. That is why we built three settings:</p>
+
+<div class="table-wrap"><table>
+<tr><th>Setting</th><th>Who it is for</th><th>Known when the decision is made</th><th>Predicts</th></tr>
+<tr><td><span class="tag ref">Reference</span></td><td>A loan that is already priced (e.g. monitoring existing loans)</td><td>applicant details + <b>grade</b> + <b>interest rate</b></td><td>probability of default only (the rate is already set)</td></tr>
+<tr><td><span class="tag A">Pipeline A</span> graded applicant</td><td>An applicant the lender has already graded A–G, rate not yet decided</td><td>applicant details + <b>grade</b></td><td>probability of default → approve/decline → interest rate</td></tr>
+<tr><td><span class="tag B">Pipeline B</span> newcomer</td><td>A brand-new applicant with no grade and no rate</td><td>applicant details only</td><td>probability of default → approve/decline → interest rate</td></tr>
+</table></div>
+
+<h2>Headline results (final test set, used once)</h2>
+<div class="grid three">
+<div class="card kpi"><span class="tag ref">Reference</span><div class="v">0.838</div><div class="l">default F1 (Random Forest)<br>Brier 0.052 · ROC-AUC 0.942</div></div>
+<div class="card kpi"><span class="tag A">Pipeline A</span><div class="v">0.837 · R² 0.907</div><div class="l">default F1 · interest-rate R²<br>rate error ±0.99 pp</div></div>
+<div class="card kpi"><span class="tag B">Pipeline B</span><div class="v">0.699 · R² 0.305</div><div class="l">default F1 · interest-rate R²<br>rate error ±2.70 pp</div></div>
+</div>
+<div class="note good"><b>Main finding.</b> The lender's grade carries almost all the useful information. Knowing only the grade
+(Pipeline A) predicts default as well as knowing grade and rate together, and explains 91% of the variation in rates. For a
+newcomer without a grade (Pipeline B), default prediction drops to F1 0.70 and only 30% of rate variation can be explained:
+the limit is the information available, not the choice of model.</div>
+<p>Baselines for comparison: predicting "everyone repays" gives F1 = 0 (accuracy 78%); guessing the average default rate for
+everyone gives Brier 0.171; guessing the average interest rate gives an error of ±3.24 pp (R² = 0).</p>
+
+<h2>How to read this site</h2>
+<div class="table-wrap"><table>
+<tr><th>Tab</th><th>What you will find</th></tr>
+<tr><td><a href="data.html">Data</a></td><td>Source, what a row is, variables, cleaning and quality issues</td></tr>
+<tr><td><a href="method.html">Method</a></td><td>Preprocessing and why, the leak-free pipeline, baseline and models compared</td></tr>
+<tr><td><a href="evaluation.html">Evaluation</a></td><td>Train/test split, cross-validation, cutoff tuning, calibration, the metrics and why</td></tr>
+<tr><td><a href="results.html">Results</a></td><td>Validation and test results, an interactive comparison of every model, the World Bank check</td></tr>
+<tr><td><a href="explore.html">Explore</a></td><td><b>Interactive:</b> move the decision cutoff on the test set; browse real test applicants and the models' decisions</td></tr>
+<tr><td><a href="analysis.html">Result analysis</a></td><td>Why each result happens, in plain words, with the evidence</td></tr>
+<tr><td><a href="limitations.html">Limitations &amp; reproduce</a></td><td>What the results do not show, how to rerun everything, AI-use disclosure, citations</td></tr>
+</table></div>
+
+<div class="pager"><span></span><a href="data.html">Data →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+
+</body></html>

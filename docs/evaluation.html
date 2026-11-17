@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html">Data</a><a href="method.html">Method</a><a href="evaluation.html" class=active>Evaluation</a><a href="results.html">Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Evaluation design</h1>
+<p class="lead">All choices were made on the training set with cross-validation; the test set was used exactly once, at the end.</p>
+
+<h2>Split, cross-validation and the test set</h2>
+<pre style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px">
+32,409 applicants
+├── TEST 20% (6,482) ───────────── locked; used once, in notebook 11, after every choice was frozen
+└── TRAIN 80% (25,927)
+     ├── 5-fold stratified cross-validation (same folds for every model)
+     │     → choose hyperparameters (mean validation F1 or RMSE)
+     │     → choose the decision cutoff (out-of-fold predictions)
+     │     → choose the PD calibration (lowest Brier score)
+     │     → compare models and choose one per setting
+     └── refit the chosen models on all 25,927 → predict the test set once</pre>
+<ul>
+<li><b>Stratified</b> split and folds: every fold keeps the 21.9% default rate, so scores differ because of the model, not luck.</li>
+<li><b>5 folds:</b> every training applicant is used for validation exactly once; models are judged by the <b>mean</b> over the 5 rounds, never the best round.</li>
+<li><b>Tuning is separate from testing:</b> the test set played no part in any choice. Its scores are reported with a bootstrap 95% interval.</li>
+</ul>
+
+<h2>Choosing the decision cutoff</h2>
+<p>A model says "default" when its PD is at or above a <b>cutoff</b>. The default 0.5 is not best when only 22% default. We
+tried <b>every distinct out-of-fold score</b> as the cutoff (an exact search, ~25,000 candidates) and kept the one with the highest F1,
+then checked it beat 0.5 in each fold. The chosen cutoffs are about 0.37–0.39 on the calibrated PD scale.
+You can move the cutoff yourself on the <a href="explore.html">Explore</a> tab.</p>
+<figure><img src="figures/logreg_cutoff_curve.png" alt="Logistic regression (notebook 02): precision, recall and F1 against the cutoff. Without SMOTE the best cutoff is 0.33; with SMOTE, 0.67, because SMOTE inflates the scores. After tuning both reach the same F1." loading="lazy"><figcaption>Logistic regression (notebook 02): precision, recall and F1 against the cutoff. Without SMOTE the best cutoff is 0.33; with SMOTE, 0.67, because SMOTE inflates the scores. After tuning both reach the same F1.</figcaption></figure>
+
+<h2>Metrics, and why each was chosen</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>What it measures</th><th>Why we use it</th></tr>
+<tr><td><b>F1</b> (main)</td><td>balance of precision and recall for defaulters</td><td>rewards catching defaulters (protects the lender) without wrongly declining good customers; "everyone repays" scores 0</td></tr>
+<tr><td>Precision</td><td>of applicants flagged, the share who really default</td><td>cost of declining good customers</td></tr>
+<tr><td>Recall</td><td>of real defaulters, the share flagged</td><td>cost of lending to people who will not repay</td></tr>
+<tr><td>ROC-AUC</td><td>how well risky applicants are ranked above safe ones, at any cutoff</td><td>separates ranking quality from the choice of cutoff</td></tr>
+<tr><td><b>Brier score</b></td><td>mean of (PD − outcome)²</td><td>accuracy of the probability itself, needed because the PD is shown to users and drives pricing (guessing 0.219 for everyone gives 0.171)</td></tr>
+<tr><td>ECE, mean PD</td><td>average gap between predicted PD and actual default rate</td><td>checks calibration: does PD 0.3 really mean 30%?</td></tr>
+<tr><td><b>RMSE</b> (rates)</td><td>typical error of the suggested rate, in percentage points</td><td>in the units a borrower cares about</td></tr>
+<tr><td><b>R²</b> (rates)</td><td>share of the variation in rates explained</td><td>comparable across pipelines (0 = no better than the average rate)</td></tr>
+<tr><td>Accuracy</td><td>share of correct predictions</td><td>reported only next to its 78% "everyone repays" baseline; misleading on its own</td></tr>
+</table></div>
+
+<div class="pager"><a href="method.html">← Method</a><a href="results.html">Results →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+
+</body></html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html">Data</a><a href="method.html">Method</a><a href="evaluation.html">Evaluation</a><a href="results.html">Results</a><a href="explore.html" class=active>Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Explore the results</h1>
+<p class="lead">Two interactive tools on the <b>test set</b> (6,482 applicants the models never saw). Nothing is retrained:
+these are the frozen models' saved predictions.</p>
+
+<div class="card">
+<b>Models used here</b>
+<ul style="margin-bottom:0">
+<li><span class="tag ref">Reference</span> Random Forest on details + grade + rate, isotonic-calibrated PD (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">nb 05</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04</a>)</li>
+<li><span class="tag A">Pipeline A</span> Random Forest on details + grade, isotonic-calibrated PD (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">nb 08</a>); rate: Random Forest regressor on grade + details (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">nb 09</a>)</li>
+<li><span class="tag B">Pipeline B</span> Random Forest on details only, Platt-calibrated PD (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">nb 06</a>); rate: Random Forest regressor on PD + details (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">nb 07</a>)</li>
+</ul></div>
+
+<h2>1. Move the decision cutoff</h2>
+<p>An applicant is declined when their PD is at or above the cutoff. Lower it to catch more defaulters (but decline more good
+customers); raise it for the opposite. The dashed line marks the cutoff chosen on the training set.</p>
+<div class="controls">
+<span class="seg" id="cutSetting"><button data-v="ref">Reference</button><button data-v="A" class="on">Pipeline A</button><button data-v="B">Pipeline B</button></span>
+<label>Cutoff <input type="range" id="cut" min="0.02" max="0.98" step="0.01"> <b id="cutVal"></b></label>
+<button class="btn" id="cutReset">Reset to chosen cutoff</button>
+</div>
+<div class="grid two">
+<div>
+<div class="cm" id="cm"></div>
+<div class="metrics" id="cutMetrics"></div>
+</div>
+<div id="cutChart" class="chart"></div>
+</div>
+<p id="cutStory" class="note"></p>
+
+<h2>2. Browse real test applicants</h2>
+<p>Filter, then click an applicant to see what each model decided, the suggested rates, and what really happened.</p>
+<div class="controls">
+<label>Show <select id="fType">
+<option value="all">all applicants</option>
+<option value="missed">defaulters the chosen pipeline approved (missed)</option>
+<option value="falsealarm">good customers the pipeline declined</option>
+<option value="caught">defaulters the pipeline caught</option>
+<option value="disagree">A and B disagree</option>
+</select></label>
+<label>Pipeline for decisions <select id="fPipe"><option value="A">Pipeline A</option><option value="B">Pipeline B</option><option value="ref">Reference</option></select></label>
+<label>Home <select id="fHome"><option value="">any</option><option>RENT</option><option>MORTGAGE</option><option>OWN</option><option>OTHER</option></select></label>
+<label>Grade <select id="fGrade"><option value="">any</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></label>
+<label>Loan / income <select id="fLti"><option value="">any</option><option value="0-0.1">≤ 10%</option><option value="0.1-0.2">10–20%</option><option value="0.2-0.3">20–30%</option><option value="0.3-1">&gt; 30%</option></select></label>
+<button class="btn" id="fRandom">Random applicant</button>
+</div>
+<p id="fCount" style="color:var(--muted);font-size:14px"></p>
+<div class="grid two">
+<div class="applist" id="appList"></div>
+<div id="appCard" class="card" style="margin:0"></div>
+</div>
+
+<div class="pager"><a href="results.html">← Results</a><a href="analysis.html">Result analysis →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<script src="assets/explore.js"></script>
+</body></html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html">Data</a><a href="method.html">Method</a><a href="evaluation.html">Evaluation</a><a href="results.html" class=active>Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Results</h1>
+<p class="lead">The chosen model in every setting is a Random Forest, for default and for the interest rate. Test results match
+validation, so the models were not tuned to the validation folds.</p>
+
+<h2>Final test set (6,482 applicants, used once)</h2>
+<div class="table-wrap"><table>
+<tr><th></th><th><span class="tag ref">Reference</span><br>rate + grade</th><th><span class="tag A">Pipeline A</span><br>grade</th><th><span class="tag B">Pipeline B</span><br>newcomer</th></tr>
+<tr><td>PD model (chosen on validation)</td><td>Random Forest, isotonic</td><td>Random Forest, isotonic</td><td>Random Forest, Platt</td></tr>
+<tr><td>PD cutoff (frozen)</td><td class="num">0.378</td><td class="num">0.367</td><td class="num">0.388</td></tr>
+<tr><td><b>F1 test</b> (95% interval)</td><td class="num"><b>0.838</b> (0.823–0.853)</td><td class="num"><b>0.837</b> (0.821–0.852)</td><td class="num"><b>0.699</b> (0.677–0.719)</td></tr>
+<tr><td>F1 validation</td><td class="num">0.829</td><td class="num">0.827</td><td class="num">0.691</td></tr>
+<tr><td>Precision / recall</td><td class="num">0.953 / 0.748</td><td class="num">0.956 / 0.743</td><td class="num">0.820 / 0.609</td></tr>
+<tr><td>ROC-AUC</td><td class="num">0.942</td><td class="num">0.939</td><td class="num">0.892</td></tr>
+<tr><td><b>Brier</b> test (validation)</td><td class="num">0.052 (0.056)</td><td class="num">0.053 (0.056)</td><td class="num">0.086 (0.088)</td></tr>
+<tr><td>ECE (calibration error)</td><td class="num">0.005</td><td class="num">0.007</td><td class="num">0.013</td></tr>
+<tr><td>Applicants approved</td><td class="num">82.8%</td><td class="num">83.0%</td><td class="num">83.7%</td></tr>
+<tr><td>Rate model</td><td>-</td><td>RF regressor on grade + details</td><td>RF regressor on PD + details</td></tr>
+<tr><td><b>Rate R²</b> test (validation)</td><td>-</td><td class="num"><b>0.907</b> (0.905)</td><td class="num"><b>0.305</b> (0.305)</td></tr>
+<tr><td>Rate error (RMSE)</td><td>-</td><td class="num">±0.99 pp</td><td class="num">±2.70 pp</td></tr>
+</table></div>
+<p>Baselines: "everyone repays" F1 = 0 (accuracy 0.781); PD = 0.219 for everyone gives Brier 0.171; the average rate for
+everyone gives RMSE 3.24 pp, R² = 0. The A and B intervals do not overlap: the gap between them is real, not noise.</p>
+<figure><img src="figures/test_confusion_reliability.png" alt="Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data)." loading="lazy"><figcaption>Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data).</figcaption></figure>
+
+<h2>Every model compared (validation, interactive)</h2>
+<p>Pick a task and a metric. These are 5-fold cross-validation scores on the training set (the test set was not used to choose).</p>
+<div class="controls">
+<span class="seg" id="task"><button data-v="clf" class="on">Default (8 classifiers)</button><button data-v="rate">Interest rate (5 regressors)</button></span>
+<label>Metric <select id="metric"></select></label>
+</div>
+<div id="cmpChart" class="chart"></div>
+<div class="table-wrap" id="cmpTable"></div>
+<div class="note">In every setting the ranking is the same: <b>Random Forest &gt; decision tree &gt; RBF SVM &gt; linear models</b>.
+SMOTE never improves F1. For rates, all five regressors are within 0.02 R² of each other in each pipeline.</div>
+
+<h2>Interest rates on the test set</h2>
+<figure><img src="figures/test_rate_scatter.png" alt="Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates." loading="lazy"><figcaption>Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates.</figcaption></figure>
+
+<h2>Do the rates look real? (World Bank check)</h2>
+<p>Every loan rate = a <b>benchmark</b> (the economy's base rate) + a <b>premium</b> for the borrower's risk. Using the US prime
+lending rate from the World Bank API, the benchmark is 3.86% (average over the years that fit the data; the data has no dates).
+Details in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a>.</p>
+<figure><img src="figures/macro_context.png" alt="US prime rate and inflation (World Bank) with each grade's average rate. Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible." loading="lazy"><figcaption>US prime rate and inflation (World Bank) with each grade's average rate. Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible.</figcaption></figure>
+<div class="grid two">
+<figure><img src="figures/pipelineA_premium_vs_actual.png" alt="Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade." loading="lazy"><figcaption>Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade.</figcaption></figure>
+<figure><img src="figures/pipelineB_premium_vs_actual.png" alt="Pipeline B: on average per PD band the suggestion is right (+6 to +8 pp), but individuals vary far more than the model can tell apart." loading="lazy"><figcaption>Pipeline B: on average per PD band the suggestion is right (+6 to +8 pp), but individuals vary far more than the model can tell apart.</figcaption></figure>
+</div>
+
+<div class="pager"><a href="evaluation.html">← Evaluation</a><a href="explore.html">Explore →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<script src="assets/results.js"></script>
+</body></html>

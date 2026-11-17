@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Method | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html">Data</a><a href="method.html" class=active>Method</a><a href="evaluation.html">Evaluation</a><a href="results.html">Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Method</h1>
+<p class="lead">How the data is prepared, why, and which models were compared, for default prediction and for interest-rate prediction.</p>
+
+<h2>Preprocessing, and why</h2>
+<div class="table-wrap"><table>
+<tr><th>Step</th><th>Applied to</th><th>Why</th></tr>
+<tr><td>Median imputation</td><td>employment length, interest rate (where it is an input)</td><td>fills gaps without being pulled by extreme values (income and loan amounts are right-skewed)</td></tr>
+<tr><td>Standardisation (mean 0, SD 1)</td><td>numeric columns</td><td>puts income (thousands) and age (tens) on the same scale, which logistic regression and SVMs need; harmless for trees</td></tr>
+<tr><td>One-hot encoding</td><td>home ownership, loan intent, past default, grade</td><td>turns categories into 0/1 columns without inventing a false order (e.g. "OWN = 2 × RENT")</td></tr>
+<tr><td>SMOTE (optional)</td><td>training folds only</td><td>creates synthetic defaulters to rebalance the classes; compared with and without (see below)</td></tr>
+</table></div>
+
+<div class="note good"><b>Leak-free by construction.</b> Every step that learns from data (the medians, the means and SDs, the
+categories, SMOTE) sits inside a scikit-learn / imbalanced-learn <code>Pipeline</code>. In every cross-validation round it is
+learned from the four training folds only and then applied to the validation fold; at the end it is learned from the training
+set only and applied to the test set. SMOTE is applied <i>only</i> when fitting, never to a validation or test fold, so those
+always keep the real 22% default rate.</div>
+
+<pre style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px">
+one cross-validation round (repeated 5 times, each fold used once for validation)
+
+  4 training folds ── impute → scale → one-hot ──(SMOTE)──► fit model
+                          │ learned statistics
+                          ▼
+  1 validation fold ── impute → scale → one-hot ──────────► predict → score (F1 / RMSE)</pre>
+
+<h2>Models for default (classification)</h2>
+<div class="table-wrap"><table>
+<tr><th>Model</th><th>Role</th><th>Why it fits</th><th>Tuned</th></tr>
+<tr><td>Logistic regression</td><td><b>baseline</b></td><td>simple, interpretable, gives probabilities; a straight-line (linear) boundary</td><td>C (regularisation)</td></tr>
+<tr><td>Soft-margin linear SVM</td><td>extra</td><td>widest-margin straight boundary; shows the maximal-margin idea and its limits</td><td>C</td></tr>
+<tr><td>SVM with RBF kernel</td><td>candidate</td><td>curved boundaries, captures interactions between features</td><td>C, γ (grid on an 8,000-row subset, confirmed on all rows)</td></tr>
+<tr><td>Decision tree</td><td>extra</td><td>yes/no rules (thresholds), readable</td><td>depth, leaf size, criterion</td></tr>
+<tr><td>Random Forest</td><td>candidate</td><td>averages 300 trees on bootstrap samples with random features per split, which cuts the variance of single trees</td><td>depth, leaf size, max_features, criterion (randomized search)</td></tr>
+</table></div>
+<p>Logistic regression and the SVMs were run <b>with and without SMOTE</b>. Trees and forests were run without it, because
+SMOTE never improved F1 for any model once the decision cutoff was tuned (see <a href="analysis.html">Result analysis</a>).</p>
+
+<h3>From score to probability of default</h3>
+<p>A good PD must mean what it says: among applicants given PD 0.30, about 30% should default. Each model's scores were turned
+into PDs with three methods: the model's own probability, <b>Platt scaling</b> (an S-shaped curve) and <b>isotonic regression</b>
+(a flexible increasing step function). The mapping is fitted by <b>cross-fitting</b>: the mapping applied to a fold never sees
+that fold's outcomes. The version with the lowest Brier score was kept (<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04_probability_of_default.ipynb</a>,
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a>).</p>
+
+<h2>Models for the interest rate (regression)</h2>
+<div class="table-wrap"><table>
+<tr><th>Model</th><th>Role</th><th>Tuned</th></tr>
+<tr><td>Predict the average rate</td><td>floor: anything useful must beat it</td><td>-</td></tr>
+<tr><td>Linear regression</td><td><b>baseline</b></td><td>-</td></tr>
+<tr><td>Ridge, Lasso</td><td>candidates (shrink coefficients; Lasso can drop inputs)</td><td>α</td></tr>
+<tr><td>Random Forest regressor</td><td>candidate (non-linear)</td><td>depth, leaf size, max_features</td></tr>
+<tr><td>Gradient boosting regressor</td><td>added to try to improve R²</td><td>learning rate, trees, leaves, L2</td></tr>
+<tr><td>Two-stage: predict the grade, then the rate</td><td>Pipeline B only (a newcomer has no grade)</td><td>uses grade probabilities from a classifier</td></tr>
+</table></div>
+
+<h2>What each setting may use</h2>
+<div class="table-wrap"><table>
+<tr><th>Setting</th><th>Default-model inputs</th><th>Rate-model inputs</th></tr>
+<tr><td><span class="tag ref">Reference</span></td><td>details + grade + rate</td><td>none (rate known)</td></tr>
+<tr><td><span class="tag A">Pipeline A</span></td><td>details + grade (no rate)</td><td>grade + details (+ PD tried; it added nothing)</td></tr>
+<tr><td><span class="tag B">Pipeline B</span></td><td>details only</td><td>details + newcomer PD (no grade)</td></tr>
+</table></div>
+<div class="note warn"><b>Why the rate is never an input when predicting the rate.</b> A PD model that used the interest rate,
+fed into a model that predicts the interest rate, would leak the answer. So Pipelines A and B use PD models that never see the
+rate, and the PD used to train the rate model is <b>out-of-fold</b> (each applicant's PD came from a model that did not train on
+them), so it behaves like a real newcomer's PD.</div>
+
+<div class="pager"><a href="data.html">← Data</a><a href="evaluation.html">Evaluation →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+
+</body></html>

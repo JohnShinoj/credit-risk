@@ -13,3 +13,6 @@ data/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local editor/preview config
+.claude/

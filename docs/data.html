@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html" class=active>Data</a><a href="method.html">Method</a><a href="evaluation.html">Evaluation</a><a href="results.html">Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html">Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Data</h1>
+<p class="lead">A public credit-risk dataset of 32,581 loan applicants, cleaned to 32,409 and split once into training and test sets.</p>
+
+<div class="card">
+<p><b>Source:</b> <i>Credit Risk Dataset</i> by laotse, Kaggle
+(<a href="https://www.kaggle.com/datasets/laotse/credit-risk-dataset" target="_blank" rel="noopener">kaggle.com/datasets/laotse/credit-risk-dataset</a>),
+downloaded with <code>kagglehub</code> in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a>. Public data; no personal identifiers.</p>
+<p><b>One row</b> = one loan applicant and their loan. <b>Size:</b> 32,581 rows × 12 columns.
+<b>Not documented:</b> the country and the loan dates. The structure (grades A–G, MORTGAGE/RENT/OWN/OTHER, a $35,000 loan cap)
+matches US marketplace lending, so amounts are read as US dollars.</p>
+<p style="margin-bottom:0"><b>Also used:</b> US prime lending rate and inflation from the World Bank Open Data API
+(<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a>), to check whether the interest rates are realistic.</p>
+</div>
+
+<h2>Variables</h2>
+<div class="table-wrap"><table>
+<tr><th>Variable</th><th>Meaning</th><th>Type</th><th>Used in</th></tr>
+<tr><td><code>person_age</code></td><td>applicant's age (years)</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>person_income</code></td><td>annual income</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>person_home_ownership</code></td><td>RENT / MORTGAGE / OWN / OTHER</td><td>category</td><td>all</td></tr>
+<tr><td><code>person_emp_length</code></td><td>years employed (887 missing after cleaning)</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>loan_intent</code></td><td>purpose: education, medical, venture, personal, debt consolidation, home improvement</td><td>category</td><td>all</td></tr>
+<tr><td><code>loan_amnt</code></td><td>loan amount</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>loan_percent_income</code></td><td>loan amount ÷ income (loan-to-income)</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>cb_person_default_on_file</code></td><td>a past default on the credit-bureau file (Y/N)</td><td>category</td><td>all</td></tr>
+<tr><td><code>cb_person_cred_hist_length</code></td><td>length of credit history (years)</td><td>numeric</td><td>all</td></tr>
+<tr><td><code>loan_grade</code></td><td>lender's risk grade A (best) … G (worst)</td><td>category</td><td>Reference, A; target of the grade classifier in B</td></tr>
+<tr><td><code>loan_int_rate</code></td><td>interest rate charged (%), 3,094 missing after cleaning</td><td>numeric</td><td>input in Reference; <b>target</b> of the rate models</td></tr>
+<tr><td><code>loan_status</code></td><td>1 = defaulted, 0 = repaid</td><td>binary</td><td><b>target</b> of the default models; never an input</td></tr>
+</table></div>
+
+<h2>Quality checks and cleaning</h2>
+<div class="table-wrap"><table>
+<tr><th>Step</th><th class="num">Rows left</th><th>Reason</th></tr>
+<tr><td>Raw data</td><td class="num">32,581</td><td></td></tr>
+<tr><td>Remove exact duplicates</td><td class="num">32,416</td><td>165 repeated rows; a copy in both train and test would inflate test scores</td></tr>
+<tr><td>Remove age &gt; 100</td><td class="num">32,411</td><td>impossible ages (up to 144)</td></tr>
+<tr><td>Remove impossible employment length</td><td class="num">32,409</td><td>&gt; 60 years, or longer than age − 14 (e.g. 123 years for a 22-year-old)</td></tr>
+</table></div>
+<div class="note"><b>Missing values were not filled in here.</b> Employment length (887) and interest rate (3,094) are filled with the
+median <i>inside each cross-validation fold</i>, learned from training rows only (see <a href="method.html">Method</a>), so the test
+set never influences them. Rows without a rate cannot be used to train or test the rate models (nothing to learn from).</div>
+
+<h2>Class balance and the train/test split</h2>
+<div class="grid two">
+<div class="card"><p><b>21.9% of applicants defaulted</b> (78.1% repaid). This is a moderate imbalance: a model that predicts
+"everyone repays" is 78% accurate but useless, which is why accuracy is not our main metric.</p></div>
+<div class="card"><p><b>Stratified 80/20 split</b> (random seed 42): <b>25,927 training</b> and <b>6,482 test</b> applicants, both
+21.9% defaulters. The test set was saved once and not opened until the final evaluation.</p></div>
+</div>
+
+<h2>Loans by grade</h2>
+<div class="table-wrap"><table>
+<tr><th>Grade</th><th class="num">Share of loans</th><th class="num">Average rate</th><th class="num">Default rate</th></tr>
+<tr><td>A</td><td class="num">33.0%</td><td class="num">7.3%</td><td class="num">10%</td></tr>
+<tr><td>B</td><td class="num">31.7%</td><td class="num">11.0%</td><td class="num">16%</td></tr>
+<tr><td>C</td><td class="num">20.1%</td><td class="num">13.5%</td><td class="num">21%</td></tr>
+<tr><td>D</td><td class="num">11.3%</td><td class="num">15.4%</td><td class="num">59%</td></tr>
+<tr><td>E</td><td class="num">3.0%</td><td class="num">17.0%</td><td class="num">65%</td></tr>
+<tr><td>F</td><td class="num">0.7%</td><td class="num">18.6%</td><td class="num">70%</td></tr>
+<tr><td>G</td><td class="num">0.2%</td><td class="num">20.3%</td><td class="num">98%</td></tr>
+</table></div>
+<p>Rates rise steadily with the grade. The default rates jump sharply from C to D and reach 98% in grade G, which is extreme for
+real lending; we come back to this in <a href="analysis.html">Result analysis</a> and <a href="limitations.html">Limitations</a>.</p>
+
+<div class="pager"><a href="index.html">← Overview</a><a href="method.html">Method →</a></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+
+</body></html>

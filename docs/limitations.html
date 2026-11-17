@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limitations & reproduce | Risk-Based Lending</title>
+<meta name="description" content="ES 335 project: predicting loan default and estimating interest rates for three lending settings.">
+<link rel="stylesheet" href="assets/style.css">
+</head><body>
+<header class="site"><div class="inner">
+<a class="brand" href="index.html">Risk-Based Lending &amp; Interest Rate Estimation<small>ES 335 · John Shinoj (25110151)</small></a>
+<nav class="tabs"><a href="index.html">Overview</a><a href="data.html">Data</a><a href="method.html">Method</a><a href="evaluation.html">Evaluation</a><a href="results.html">Results</a><a href="explore.html">Explore</a><a href="analysis.html">Result analysis</a><a href="limitations.html" class=active>Limitations & reproduce</a></nav></div></header>
+<main>
+
+<h1>Limitations, reproduction, AI use and citations</h1>
+
+<h2>Limitations</h2>
+<ol>
+<li><b>No loan dates.</b> We cannot study changes over time or link each loan to the economy when it was issued, as the proposal
+planned. Macro data was used for a plausibility check instead, with an inferred benchmark (average US prime rate over the years
+that fit the data).</li>
+<li><b>Country not documented.</b> US lending is assumed from the data's structure; the World Bank comparison depends on that.</li>
+<li><b>Possibly partly simulated data.</b> Rules without exceptions (100%-default groups, no past defaults in grades A–B) and
+extreme default rates suggest the scores may be higher than on real loans.</li>
+<li><b>Only approved loans.</b> The data contains loans that were granted; we never see rejected applicants
+(selection bias / reject inference), so the models learn from an already-filtered population.</li>
+<li><b>One dataset.</b> Performance on other lenders, countries or periods is untested. A direct check on another lender
+(e.g. Lending Club) was not possible because key inputs such as age are missing there.</li>
+<li><b>Information ceiling for newcomers.</b> Without credit-file information the rate can only be estimated to about ±2.7 pp.</li>
+<li><b>Method details.</b> SMOTE was applied after one-hot encoding, so it interpolates categories (SMOTENC would be the
+cleaner variant); it never improved F1 here. The RBF SVM in Pipelines A and B was tuned on an 8,000-row subset only.
+The forest searches were randomized (15 combinations), not exhaustive.</li>
+<li><b>Correlation, not causation.</b> The models show which applicants defaulted, not what <i>causes</i> default; in
+particular, a lower interest rate would not make a risky applicant safer in these models.</li>
+</ol>
+
+<h2>Reproduce</h2>
+<p>Repository: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>. Setup and run steps are in the README.
+All random choices use seed 42; the train/test split is created once in notebook 01 and saved.</p>
+<div class="table-wrap"><table>
+<tr><th>Notebook</th><th>What it does</th></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a></td><td>download (kagglehub), cleaning, stratified 80/20 split</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02_probability_of_default.ipynb</a></td><td>Reference: logistic regression, SMOTE, cutoff tuning, linear and RBF SVM, C/γ grid search</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03_decision_trees.ipynb</a></td><td>Reference: decision tree (depth curve, tuning, readable tree)</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04_probability_of_default.ipynb</a></td><td>Reference: calibrated PD for every model</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05_random_forest.ipynb</a></td><td>Reference: bagging vs Random Forest, tuning, importance</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a></td><td>Pipeline B: every model without rate and grade, calibrated PD</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07_interest_rate_regression.ipynb</a></td><td>Pipeline B: interest-rate regression, gradient boosting, two-stage grade model</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a></td><td>Pipeline A: every model with grade but no rate, calibrated PD</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09_interest_rate_with_grade.ipynb</a></td><td>Pipeline A: interest-rate regression with grade</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10_results_summary.ipynb</a></td><td>all validation results in one place</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a></td><td>final test set (used once), error analysis</td></tr>
+<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a></td><td>World Bank API check of the interest rates</td></tr>
+</table></div>
+<p>This website's data is exported from the notebooks' saved outputs by <code>src/export_site_data.py</code>.</p>
+
+<h2>AI-use disclosure</h2>
+<div class="card">
+<p><b>Tool used:</b> Claude (Anthropic), model Claude Opus 5.5, through the Claude Code desktop app, 7–17 November 2026.</p>
+<p><b>What I did myself.</b> Chose the topic and wrote the research questions and project proposal (data plan, baseline and candidate
+methods, evaluation plan). Made the design decisions during the project: working step by step; the three settings (rate + grade
+known, grade known, newcomer); which models and hyperparameters to tune; keeping the decision tree as a final-model candidate;
+excluding the grade from newcomer pricing; trimming the tree and forest experiments; deferring SMOTENC; the World Bank check.
+Reviewed every step's code and results, ran the notebooks, asked questions until I understood each method (cross-validation, SMOTE,
+cutoff tuning, calibration, Brier score, bagging, regression metrics), and approved each change before it was made.</p>
+<p><b>What the AI assistant did.</b> Wrote most of the Python code in the notebooks and in <code>src/</code> following my instructions
+and approvals; explained the theory behind each method and proposed options that I chose between; ran the notebooks to check they
+worked and found and fixed errors (for example a leakage risk when using PD as an input to the rate model, and a conclusion about
+Pipeline B that the data contradicted); drafted the text of this website and the README, which I reviewed and edited.</p>
+<p style="margin-bottom:0"><b>How I checked it.</b> Every number on this site comes from the notebooks in the repository and can be
+reproduced by running them. The test set was used once, after all choices were frozen (notebook 11). All conclusions, and any
+errors, are my responsibility.</p>
+</div>
+
+<h2>Citations</h2>
+<ul>
+<li>laotse. <i>Credit Risk Dataset</i>. Kaggle. https://www.kaggle.com/datasets/laotse/credit-risk-dataset</li>
+<li>World Bank Open Data API: indicators FR.INR.LEND (lending interest rate) and FP.CPI.TOTL.ZG (inflation), United States. https://data.worldbank.org</li>
+<li>Pedregosa, F. et al. (2011). Scikit-learn: Machine Learning in Python. <i>JMLR</i> 12, 2825–2830.</li>
+<li>Lemaître, G., Nogueira, F., Aridas, C. (2017). Imbalanced-learn. <i>JMLR</i> 18(17), 1–5.</li>
+<li>Chawla, N. V. et al. (2002). SMOTE: Synthetic Minority Over-sampling Technique. <i>JAIR</i> 16, 321–357.</li>
+<li>Breiman, L. (2001). Random Forests. <i>Machine Learning</i> 45, 5–32.</li>
+<li>Cortes, C., Vapnik, V. (1995). Support-vector networks. <i>Machine Learning</i> 20, 273–297.</li>
+<li>Platt, J. (1999). Probabilistic outputs for support vector machines. <i>Advances in Large Margin Classifiers</i>.</li>
+<li>Zadrozny, B., Elkan, C. (2002). Transforming classifier scores into accurate multiclass probability estimates. <i>KDD</i>.</li>
+<li>Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. <i>Monthly Weather Review</i> 78(1).</li>
+<li>Bergstra, J., Bengio, Y. (2012). Random search for hyper-parameter optimization. <i>JMLR</i> 13, 281–305.</li>
+<li>Lipton, Z. C., Elkan, C., Narayanaswamy, B. (2014). Optimal thresholding of classifiers to maximize F1. <i>ECML PKDD</i>.</li>
+<li>James, G., Witten, D., Hastie, T., Tibshirani, R. <i>An Introduction to Statistical Learning</i>. Springer.</li>
+<li>Software: pandas, NumPy, Matplotlib, Seaborn, Jupyter, requests, kagglehub, Plotly.js (website charts).</li>
+<li>AI assistance: Claude (Anthropic); see the AI-use disclosure above.</li>
+</ul>
+
+<div class="pager"><a href="analysis.html">← Result analysis</a><span></span></div>
+</main>
+<footer>Code, notebooks and full results: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>.
+Every number on this site is produced by the notebooks in that repository.</footer>
+
+</body></html>
