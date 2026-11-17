@@ -13,52 +13,99 @@
 <h1>Limitations, reproduction, AI use and citations</h1>
 
 <h2>Limitations</h2>
-<ol>
-<li><b>No loan dates.</b> We cannot study changes over time or link each loan to the economy when it was issued, as the proposal
-planned. Macro data was used for a plausibility check instead, with an inferred benchmark (average US prime rate over the years
-that fit the data).</li>
-<li><b>How the grade is produced is not documented.</b> Pipeline A, our main pricing pipeline, assumes the grade is a universal
-credit-history rating available when someone applies (like a credit score such as CIBIL). If the grade is only assigned by this lender after its own
-assessment, Pipeline A applies only after that step, and Pipeline B is the realistic setting for new applicants. Pipeline A's
-rate accuracy (R² 0.91) also reflects this lender's own pricing and may be lower for other lenders.</li>
-<li><b>Country not documented.</b> US lending is assumed from the data's structure; the World Bank comparison depends on that.</li>
-<li><b>Possibly partly simulated data.</b> Rules without exceptions (100%-default groups, no past defaults in grades A–B) and
-extreme default rates suggest the scores may be higher than on real loans.</li>
-<li><b>Only approved loans.</b> The data contains loans that were granted; we never see rejected applicants
-(selection bias / reject inference), so the models learn from an already-filtered population.</li>
-<li><b>One dataset.</b> Performance on other lenders, countries or periods is untested. A direct check on another lender
-(e.g. Lending Club) was not possible because key inputs such as age are missing there.</li>
-<li><b>Information ceiling for newcomers.</b> Without credit-history information (the grade) the rate can only be estimated to about ±2.7 pp.</li>
-<li><b>The rate model copies past pricing.</b> It is trained on the rates this lender actually charged, so it suggests what
-similar borrowers paid, not a break-even or profit-maximising rate. The cutoff is chosen by F1, which treats a missed
-defaulter and a wrongly declined good borrower as equally costly; a cutoff based on money (loss on default vs. interest
-earned) would probably be stricter.</li>
-<li><b>Method details.</b> SMOTE was applied after one-hot encoding, so it interpolates categories (SMOTENC would be the
-cleaner variant); it never improved F1 here. The RBF SVM in Pipelines A and B was tuned on an 8,000-row subset only.
-The forest searches were randomized (15 combinations), not exhaustive.</li>
-<li><b>Correlation, not causation.</b> The models show which applicants defaulted, not what <i>causes</i> default; in
-particular, a lower interest rate would not make a risky applicant safer in these models.</li>
-</ol>
+<p>Each limitation below explains the issue, its effect on our results, and what we did about it (or what would fix it).</p>
+<div class="card"><h3 style="margin-top:0">1. No loan dates</h3><div class="why">
+<div class="row"><b>The issue</b><div>The dataset does not say <i>when</i> each loan was given. Interest rates depend strongly on the economy at the time: when the central bank raises its rate, every loan becomes more expensive.</div></div>
+<div class="row"><b>Effect</b><div>We cannot study how risk or pricing changed over time, and we cannot match each loan to the economy at the moment it was issued, as the proposal originally planned. A random train/test split also cannot test whether a model trained on older loans works on newer ones.</div></div>
+<div class="row"><b>What we did</b><div>We used the World Bank data as a <b>plausibility check</b> instead: we kept only the years in which the US prime rate was below the cheapest loans in the data, and used the average prime rate over those years (3.86%) as one fixed benchmark. With dates, each loan could be compared with the benchmark of its own year, and the split could be made by time.</div></div></div></div><div class="card"><h3 style="margin-top:0">2. How the grade is produced is not documented</h3><div class="why">
+<div class="row"><b>The issue</b><div>The dataset gives each loan a grade A–G but does not say who assigned it or how. We treat it as a universal credit-history rating, available when someone applies, like a credit score such as CIBIL.</div></div>
+<div class="row"><b>Effect</b><div><span class="tag A">Pipeline A</span>, our main pricing pipeline, depends on this assumption. If the grade is instead assigned by this lender only after its own assessment, Pipeline A can only be used after that step, and <span class="tag B">Pipeline B</span> is the realistic setting for brand-new applicants. Pipeline A's high rate accuracy (R² 0.91) also reflects how closely <i>this</i> lender priced from its own grade; for another lender it may be lower.</div></div>
+<div class="row"><b>What we did</b><div>We built and reported all three settings, so the results are available under either reading: Pipeline A if the grade is known at application, Pipeline B if it is not. The assumption is stated wherever Pipeline A is described.</div></div></div></div><div class="card"><h3 style="margin-top:0">3. Country not documented</h3><div class="why">
+<div class="row"><b>The issue</b><div>The dataset does not say which country the loans come from. We assume the United States from its structure (dollar amounts, a $35,000 loan cap, and grades and home-ownership categories as used by US lenders).</div></div>
+<div class="row"><b>Effect</b><div>The World Bank comparison uses US interest rates. If the loans came from another country, the benchmark (3.86%) and therefore all premiums would be different. The default and rate models themselves do not depend on the country.</div></div>
+<div class="row"><b>What we did</b><div>The assumption is stated on the Data and Results tabs, and the World Bank part is presented only as a plausibility check, not as a result the models depend on.</div></div></div></div><div class="card"><h3 style="margin-top:0">4. Possibly partly simulated data</h3><div class="why">
+<div class="row"><b>The issue</b><div>Real lending data is messy, but this data contains rules with <b>no exceptions</b>: every applicant who rents and borrows more than about 31% of income defaulted (about 1,870 people), and grades A and B contain no applicant with a past default. Default rates are also extreme: 22% overall and 98% in grade G (calculated from the data).</div></div>
+<div class="row"><b>Effect</b><div>Clean, rule-like patterns are easy for tree models to learn, so our scores (for example F1 0.84) may be <b>higher than the same models would reach on real loans</b>. No real lender could keep lending at about 20% interest to a group where 98% default, so the defaults may not reflect real behaviour.</div></div>
+<div class="row"><b>What we did</b><div>We report this openly (Result analysis, finding 7) and describe the results as results on this dataset, not on lending in general. Testing on a second, real dataset would show how much the scores drop.</div></div></div></div><div class="card"><h3 style="margin-top:0">5. Only approved loans (selection bias)</h3><div class="why">
+<div class="row"><b>The issue</b><div>The data contains only loans that were actually granted. Applicants the lender rejected never appear, so we never see whether they would have repaid.</div></div>
+<div class="row"><b>Effect</b><div>The models learn from an already-filtered group. When used on <i>all</i> applicants, including the kind the lender used to reject, their PDs may be too low, because such people are rare in the training data. This is a known problem in credit scoring (reject inference).</div></div>
+<div class="row"><b>What we did</b><div>Nothing can fix this with this data. It would need records of rejected applicants, or methods that estimate how they would have behaved.</div></div></div></div><div class="card"><h3 style="margin-top:0">6. One dataset only</h3><div class="why">
+<div class="row"><b>The issue</b><div>All models were trained and tested on one lender's data. The test set comes from the same data, only a different 20% of it.</div></div>
+<div class="row"><b>Effect</b><div>The test result shows how the models do on <i>new applicants of this lender</i>. How they would do for other lenders, countries or time periods is untested.</div></div>
+<div class="row"><b>What we did</b><div>We looked for a second dataset to check against (for example Lending Club), but key inputs such as age are missing there, so the same models could not be applied.</div></div></div></div><div class="card"><h3 style="margin-top:0">7. Information ceiling for newcomers</h3><div class="why">
+<div class="row"><b>The issue</b><div>Without the grade, the only credit-history facts left are past default (yes/no) and length of credit history. The lender set rates mainly from the grade.</div></div>
+<div class="row"><b>Effect</b><div><span class="tag B">Pipeline B</span> can predict a newcomer's rate only to about ±2.7 pp (R² 0.31), and its default decisions are weaker (F1 0.70 vs 0.84). Six different rate models all stopped at the same R² ≈ 0.30, so a better model would not help: the information is missing.</div></div>
+<div class="row"><b>What we did</b><div>We tried predicting the grade first (two-stage model); it did not help (R² 0.303 vs 0.305). Pipeline B is therefore presented as a rough fallback, with Pipeline A as the main pricing pipeline.</div></div></div></div><div class="card"><h3 style="margin-top:0">8. The rate model copies past pricing, and the cutoff ignores money</h3><div class="why">
+<div class="row"><b>The issue</b><div>The rate model is trained on the rates this lender actually charged. The approve/decline cutoff is chosen to maximise F1.</div></div>
+<div class="row"><b>Effect</b><div>The suggested rate is what <i>similar borrowers paid in the past</i>, not a break-even or profit-maximising rate. F1 treats a missed defaulter (the lender loses most of the loan) and a wrongly declined good customer (the lender loses only the interest) as equally bad. A cutoff based on money would probably be <b>stricter</b> than ours (0.37–0.39): to break even on a borrower with a 37% chance of default, the rate would need to be roughly 35–60%, far above the 23% maximum in the data.</div></div>
+<div class="row"><b>What we did</b><div>We state this as a limitation. With the loss per default and the lender's funding cost, the cutoff could instead be chosen to maximise expected profit, and a rate could be calculated from the PD.</div></div></div></div><div class="card"><h3 style="margin-top:0">9. Method details</h3><div class="why">
+<div class="row"><b>The issue</b><div>Three shortcuts in how the models were built: (a) SMOTE was applied after one-hot encoding, so its synthetic applicants can have "in-between" categories (for example 0.4 renter); (b) the RBF SVM in Pipelines A and B was tuned on an 8,000-row subset, not the full training set; (c) the forest searches tried 15 random combinations, not every combination.</div></div>
+<div class="row"><b>Effect</b><div>(a) The synthetic defaulters are slightly unrealistic. (b) and (c) The chosen settings may not be the very best possible.</div></div>
+<div class="row"><b>What we did</b><div>(a) SMOTENC, which handles categories properly, would be the cleaner choice; SMOTE never improved F1 here and the final models do not use it, so this does not affect the final results. (b) The subset result was confirmed on the full training set in the Reference setting. (c) A full search might find slightly better settings, but the Random Forest was already the best model in every setting.</div></div></div></div><div class="card"><h3 style="margin-top:0">10. Correlation, not causation</h3><div class="why">
+<div class="row"><b>The issue</b><div>The models learn which kinds of applicants defaulted in the past. They do not learn what <i>causes</i> default.</div></div>
+<div class="row"><b>Effect</b><div>The PD cannot be used to answer "what if" questions. For example, a lower interest rate would not make a risky applicant safer in these models, even though in reality a lower repayment might reduce default. Likewise, telling an applicant to change one input would not necessarily change their real risk.</div></div>
+<div class="row"><b>What we did</b><div>We use the models only for prediction (who is likely to default, what similar borrowers paid) and do not draw causal conclusions.</div></div></div></div>
 
 <h2>Reproduce</h2>
-<p>Repository: <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>. Setup and run steps are in the README.
-All random choices use seed 42; the train/test split is created once in notebook 01 and saved.</p>
+<p>Everything on this site can be recreated from the repository:
+<a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a>. The README has the same steps.</p>
+
+<h3>1. Set up Python</h3>
+<p>Python 3.13 (tested with 3.13.11 on Windows; other systems should work). Create a virtual environment, install the exact
+package versions in <code>requirements.txt</code>, and register the environment as a Jupyter kernel:</p>
+<pre style="background:#f7f7f5;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px">python -m venv .venv
+.venv\Scripts\activate            (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements.txt
+python -m ipykernel install --user --name ml-project-venv --display-name "ML project (.venv 3.13)"</pre>
+<p>Select the kernel <b>"ML project (.venv 3.13)"</b> in Jupyter or VS Code. Pinned versions matter: a different scikit-learn
+version can give slightly different numbers.</p>
+
+<h3>2. Get the data</h3>
+<ul>
+<li><b>Loan data:</b> notebook 01 downloads the public Kaggle <i>Credit Risk Dataset</i> automatically with
+<code>kagglehub</code>. If it asks for credentials, create a free Kaggle account and an API token (Kaggle → Settings → API), or
+download <code>credit_risk_dataset.csv</code> by hand and point notebook 01 to it.</li>
+<li><b>World Bank data:</b> notebook 12 downloads it from the public World Bank API (no key needed) and saves a copy, so it only
+downloads once.</li>
+<li>The data is <b>not stored in the repository</b> (it is recreated by the notebooks). The repository contains no private data,
+passwords or API keys.</li>
+</ul>
+
+<h3>3. Run the notebooks in order</h3>
+<p>Run each notebook from top to bottom. Later notebooks read files saved by earlier ones (the train/test split, the chosen
+settings in <code>reports/</code>), so the order matters. Times are for a 12-core laptop on mains power.</p>
 <div class="table-wrap"><table>
-<tr><th>Notebook</th><th>What it does</th></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a></td><td>download (kagglehub), cleaning, stratified 80/20 split</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02_probability_of_default.ipynb</a></td><td>Reference: logistic regression, SMOTE, cutoff tuning, linear and RBF SVM, C/γ grid search</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03_decision_trees.ipynb</a></td><td>Reference: decision tree (depth curve, tuning, readable tree)</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04_probability_of_default.ipynb</a></td><td>Reference: calibrated PD for every model</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05_random_forest.ipynb</a></td><td>Reference: bagging vs Random Forest, tuning, importance</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a></td><td>Pipeline B: every model without rate and grade, calibrated PD</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07_interest_rate_regression.ipynb</a></td><td>Pipeline B: interest-rate regression, gradient boosting, two-stage grade model</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a></td><td>Pipeline A: every model with grade but no rate, calibrated PD</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09_interest_rate_with_grade.ipynb</a></td><td>Pipeline A: interest-rate regression with grade</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10_results_summary.ipynb</a></td><td>all validation results in one place</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a></td><td>final test set (used once), error analysis</td></tr>
-<tr><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a></td><td>World Bank API check of the interest rates</td></tr>
+<tr><th>Order</th><th>Notebook</th><th>What it does</th><th>Time</th></tr>
+<tr><td>1</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a></td><td>download, cleaning (172 rows removed), stratified 80/20 train/test split, saved once</td><td>&lt; 1 min</td></tr>
+<tr><td>2</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02_probability_of_default.ipynb</a></td><td>Reference: logistic regression, SMOTE, cutoff tuning, linear and RBF SVM with C/γ grid search</td><td>~35 min</td></tr>
+<tr><td>3</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03_decision_trees.ipynb</a></td><td>Reference: decision tree (depth curve, tuning, readable tree)</td><td>~1 min</td></tr>
+<tr><td>4</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05_random_forest.ipynb</a></td><td>Reference: bagging vs Random Forest, tuning, importance</td><td>~10 min</td></tr>
+<tr><td>5</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04_probability_of_default.ipynb</a></td><td>Reference: calibrated PD for every model (<b>needs 03 and 05 first</b>)</td><td>~5 min</td></tr>
+<tr><td>6</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a></td><td>Pipeline B: every model without rate and grade, calibrated PD</td><td>~15 min</td></tr>
+<tr><td>7</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07_interest_rate_regression.ipynb</a></td><td>Pipeline B: interest-rate models, gradient boosting, two-stage grade model</td><td>~5 min</td></tr>
+<tr><td>8</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a></td><td>Pipeline A: every model with grade but no rate, calibrated PD</td><td>~45 min</td></tr>
+<tr><td>9</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09_interest_rate_with_grade.ipynb</a></td><td>Pipeline A: interest-rate models with grade</td><td>~7 min</td></tr>
+<tr><td>10</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10_results_summary.ipynb</a></td><td>all validation results in one place</td><td>~1 min</td></tr>
+<tr><td>11</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a></td><td><b>final test set, used once</b>; error analysis; saves per-applicant test predictions</td><td>~1 min</td></tr>
+<tr><td>12</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a></td><td>World Bank check of the interest rates; website figures</td><td>~1 min</td></tr>
 </table></div>
-<p>This website's data is exported from the notebooks' saved outputs by <code>src/export_site_data.py</code>.</p>
+
+<h3>4. Rebuild the website data</h3>
+<p>Run <code>python src/export_site_data.py</code>. It reads the notebooks' saved results and writes the website's data files
+(<code>docs/data/</code>) and figures (<code>docs/figures/</code>). To view the site locally:
+<code>python -m http.server 8765 --directory docs</code>, then open <code>http://localhost:8765</code>.</p>
+
+<h3>Why the results come out the same every time</h3>
+<ul>
+<li><b>Fixed randomness:</b> every random step (the split, the folds, SMOTE, the forests, the bootstrap) uses seed 42.</li>
+<li><b>One split, saved:</b> the train/test split is made once in notebook 01 and saved; every later notebook reads the same files.</li>
+<li><b>Same folds everywhere:</b> every model uses the same 5 cross-validation folds (<code>src/credit.make_cv</code>), so models
+are compared on exactly the same data.</li>
+<li><b>No leakage:</b> all learned preprocessing (filling gaps, scaling, encoding, SMOTE) sits inside the model pipeline, so it is
+learned from the training folds only.</li>
+<li><b>Choices saved, test used once:</b> every choice is made with cross-validation and saved in <code>reports/</code>; notebook 11
+is the only notebook that opens the test set.</li>
+</ul>
 
 <h2>AI-use disclosure</h2>
 <div class="card">
