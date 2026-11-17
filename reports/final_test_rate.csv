@@ -1,0 +1,7 @@
+pipeline,group,loans,RMSE (pp),MAE (pp),R²,validation RMSE,validation R²
+Pipeline A (grade),all test loans,5851,0.9872,0.7771,0.9073,0.9968,0.9054
+Pipeline A (grade),approved (PD < cutoff),4852,0.9804,0.7738,0.8912,,
+Pipeline A (grade),declined,999,1.0199,0.7934,0.9067,,
+Pipeline B (newcomer),all test loans,5851,2.7033,2.1925,0.3048,2.7022,0.3049
+Pipeline B (newcomer),approved (PD < cutoff),4907,2.7256,2.2207,0.2628,,
+Pipeline B (newcomer),declined,944,2.5838,2.0456,0.3494,,

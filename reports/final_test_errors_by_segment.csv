@@ -1,0 +1,51 @@
+pipeline,segment,value,applicants,default rate,missed defaulters,good customers declined
+Pipeline A (grade),person_home_ownership,MORTGAGE,2651,0.1294,0.5277,0.0095
+Pipeline A (grade),person_home_ownership,OTHER,23,0.2174,0.4,0.0
+Pipeline A (grade),person_home_ownership,OWN,533,0.0788,0.0714,0.0
+Pipeline A (grade),person_home_ownership,RENT,3275,0.3139,0.1732,0.0116
+Pipeline A (grade),loan_intent,DEBTCONSOLIDATION,1010,0.2931,0.1858,0.0056
+Pipeline A (grade),loan_intent,EDUCATION,1239,0.1743,0.3102,0.0088
+Pipeline A (grade),loan_intent,HOMEIMPROVEMENT,733,0.2469,0.2928,0.0145
+Pipeline A (grade),loan_intent,MEDICAL,1241,0.2788,0.2399,0.0112
+Pipeline A (grade),loan_intent,PERSONAL,1085,0.2074,0.3467,0.0105
+Pipeline A (grade),loan_intent,VENTURE,1174,0.1312,0.1818,0.0078
+Pipeline A (grade),income band,lowest 25%,1636,0.3912,0.1609,0.0241
+Pipeline A (grade),income band,25-50%,1606,0.208,0.2964,0.0102
+Pipeline A (grade),income band,50-75%,1676,0.1766,0.3784,0.0058
+Pipeline A (grade),income band,highest 25%,1564,0.0946,0.3378,0.0021
+Pipeline A (grade),loan-to-income,<=10%,2090,0.1187,0.4879,0.0049
+Pipeline A (grade),loan-to-income,10-20%,2404,0.1489,0.3631,0.0088
+Pipeline A (grade),loan-to-income,20-30%,1221,0.2228,0.3346,0.0148
+Pipeline A (grade),loan-to-income,>30%,767,0.704,0.0407,0.0308
+Pipeline A (grade),loan_grade,A,2172,0.0971,0.327,0.0015
+Pipeline A (grade),loan_grade,B,2103,0.1583,0.3694,0.0034
+Pipeline A (grade),loan_grade,C,1215,0.2263,0.4036,0.0117
+Pipeline A (grade),loan_grade,D,729,0.5898,0.1023,0.0502
+Pipeline A (grade),loan_grade,E,208,0.6106,0.126,0.0988
+Pipeline A (grade),loan_grade,F,45,0.7111,0.0312,0.3846
+Pipeline A (grade),loan_grade,G,10,1.0,0.0,
+Pipeline B (newcomer),person_home_ownership,MORTGAGE,2651,0.1294,0.7085,0.0256
+Pipeline B (newcomer),person_home_ownership,OTHER,23,0.2174,0.2,0.0
+Pipeline B (newcomer),person_home_ownership,OWN,533,0.0788,0.1667,0.0041
+Pipeline B (newcomer),person_home_ownership,RENT,3275,0.3139,0.2947,0.0574
+Pipeline B (newcomer),loan_intent,DEBTCONSOLIDATION,1010,0.2931,0.3615,0.0882
+Pipeline B (newcomer),loan_intent,EDUCATION,1239,0.1743,0.4259,0.0205
+Pipeline B (newcomer),loan_intent,HOMEIMPROVEMENT,733,0.2469,0.3425,0.0236
+Pipeline B (newcomer),loan_intent,MEDICAL,1241,0.2788,0.4249,0.0581
+Pipeline B (newcomer),loan_intent,PERSONAL,1085,0.2074,0.3956,0.0302
+Pipeline B (newcomer),loan_intent,VENTURE,1174,0.1312,0.3701,0.0147
+Pipeline B (newcomer),income band,lowest 25%,1636,0.3912,0.2344,0.0773
+Pipeline B (newcomer),income band,25-50%,1606,0.208,0.3982,0.0417
+Pipeline B (newcomer),income band,50-75%,1676,0.1766,0.527,0.0268
+Pipeline B (newcomer),income band,highest 25%,1564,0.0946,0.777,0.0162
+Pipeline B (newcomer),loan-to-income,<=10%,2090,0.1187,0.754,0.0261
+Pipeline B (newcomer),loan-to-income,10-20%,2404,0.1489,0.6229,0.0371
+Pipeline B (newcomer),loan-to-income,20-30%,1221,0.2228,0.4338,0.0611
+Pipeline B (newcomer),loan-to-income,>30%,767,0.704,0.0481,0.0352
+Pipeline B (newcomer),loan_grade,A,2172,0.0971,0.2844,0.0235
+Pipeline B (newcomer),loan_grade,B,2103,0.1583,0.3333,0.0158
+Pipeline B (newcomer),loan_grade,C,1215,0.2263,0.3273,0.116
+Pipeline B (newcomer),loan_grade,D,729,0.5898,0.4791,0.0201
+Pipeline B (newcomer),loan_grade,E,208,0.6106,0.5276,0.0123
+Pipeline B (newcomer),loan_grade,F,45,0.7111,0.375,0.0
+Pipeline B (newcomer),loan_grade,G,10,1.0,0.8,
