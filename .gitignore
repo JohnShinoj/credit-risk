@@ -7,7 +7,7 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Generated data (recreated by notebooks/01_clean_split.ipynb from Kaggle)
-data/
+/data/
 
 # Editor / OS
 .vscode/
