@@ -1,0 +1,66 @@
+{
+  "pipeline": "A (graded applicant)",
+  "model": "Random Forest",
+  "params": {
+    "min_samples_leaf": 1,
+    "max_features": 0.5,
+    "max_depth": 30,
+    "criterion": "gini"
+  },
+  "calibration": "isotonic",
+  "pd_cutoff": 0.36666666666666664,
+  "cv_f1_at_cutoff": 0.826939809130096,
+  "cv_precision_at_cutoff": 0.9509913722393915,
+  "cv_recall_at_cutoff": 0.7315696649029982,
+  "brier": 0.05638045782807401,
+  "features": {
+    "numeric": [
+      "person_age",
+      "person_income",
+      "person_emp_length",
+      "loan_amnt",
+      "loan_percent_income",
+      "cb_person_cred_hist_length"
+    ],
+    "categorical": [
+      "person_home_ownership",
+      "loan_intent",
+      "cb_person_default_on_file",
+      "loan_grade"
+    ]
+  },
+  "n_estimators": 300,
+  "all_chosen_settings": {
+    "LogReg (no SMOTE)": {
+      "C": 100
+    },
+    "LogReg + SMOTE": {
+      "C": 1
+    },
+    "Linear SVM (no SMOTE)": {
+      "C": 1
+    },
+    "Linear SVM + SMOTE": {
+      "C": 3
+    },
+    "SVM RBF (no SMOTE)": {
+      "C": 100,
+      "gamma": 0.03
+    },
+    "SVM RBF + SMOTE": {
+      "C": 30,
+      "gamma": 0.03
+    },
+    "Tree": {
+      "criterion": "entropy",
+      "max_depth": 12,
+      "min_samples_leaf": 5
+    },
+    "Random Forest": {
+      "min_samples_leaf": 1,
+      "max_features": 0.5,
+      "max_depth": 30,
+      "criterion": "gini"
+    }
+  }
+}

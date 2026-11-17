@@ -1,0 +1,13 @@
+{
+  "Random Forest": {
+    "params": {
+      "max_depth": 30,
+      "min_samples_leaf": 1,
+      "criterion": "gini",
+      "max_features": 0.5
+    },
+    "n_estimators": 300,
+    "cutoff": 0.45290000263428254,
+    "cv_f1_at_cutoff": 0.8298012357927919
+  }
+}

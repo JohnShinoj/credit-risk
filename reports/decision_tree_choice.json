@@ -1,0 +1,15 @@
+{
+  "Tree": {
+    "params": {
+      "max_depth": 10,
+      "min_samples_leaf": 1,
+      "criterion": "entropy"
+    },
+    "cutoff": 0.6,
+    "cv_f1_at_cutoff": 0.8128009841403669,
+    "cv_f1_at_default": 0.8115407845574705,
+    "cv_precision_at_cutoff": 0.9706763733631923,
+    "cv_recall_at_cutoff": 0.6991181657848324,
+    "cv_roc_auc": 0.9062249524145507
+  }
+}

@@ -1,0 +1,9 @@
+model,PD method,mean PD,Brier,log loss,ECE,ROC-AUC
+"Random Forest (min_samples_leaf=1, max_features=0.5, max_depth=30, criterion=gini)",isotonic,0.2186,0.0564,0.2038,0.0028,0.9325
+"Tree (criterion=entropy, max_depth=12, min_samples_leaf=5)",isotonic,0.2193,0.0606,0.2262,0.0031,0.908
+"SVM RBF (no SMOTE) (C=100, gamma=0.03)",isotonic,0.2187,0.0692,0.2485,0.002,0.9045
+"SVM RBF + SMOTE (C=30, gamma=0.03)",isotonic,0.2186,0.0727,0.2579,0.0039,0.9056
+Linear SVM (no SMOTE) (C=1),isotonic,0.2187,0.1014,0.3391,0.003,0.8641
+LogReg (no SMOTE) (C=100),isotonic,0.2186,0.1015,0.3383,0.0028,0.8664
+LogReg + SMOTE (C=1),isotonic,0.2187,0.1028,0.3407,0.0026,0.8678
+Linear SVM + SMOTE (C=3),isotonic,0.2187,0.1036,0.3438,0.0031,0.8645

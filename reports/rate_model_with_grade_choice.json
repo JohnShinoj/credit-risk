@@ -1,0 +1,31 @@
+{
+  "model": "Random Forest regressor",
+  "inputs": "grade + details",
+  "numeric": [
+    "person_age",
+    "person_income",
+    "person_emp_length",
+    "loan_amnt",
+    "loan_percent_income",
+    "cb_person_cred_hist_length"
+  ],
+  "categorical": [
+    "person_home_ownership",
+    "loan_intent",
+    "cb_person_default_on_file",
+    "loan_grade"
+  ],
+  "ridge_alpha": 0.001,
+  "lasso_alpha": 0.00021544346900318845,
+  "rf_params": {
+    "min_samples_leaf": 1,
+    "max_features": 0.5,
+    "max_depth": 20
+  },
+  "rf_n_estimators": 300,
+  "cv_rmse": 0.9967946434165345,
+  "cv_r2": 0.9053795264870764,
+  "pipeline": "A (graded applicant)",
+  "pd_input": "graded_pd (notebook 08)",
+  "note": "requires the lender's loan_grade; not usable for newcomers without a grade"
+}

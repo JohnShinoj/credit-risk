@@ -1,0 +1,65 @@
+{
+  "pipeline": "B (newcomer)",
+  "model": "Random Forest",
+  "params": {
+    "min_samples_leaf": 2,
+    "max_features": null,
+    "max_depth": null,
+    "criterion": "gini"
+  },
+  "calibration": "Platt (sigmoid)",
+  "pd_cutoff": 0.3883119947573823,
+  "cv_f1_at_cutoff": 0.6908371358997414,
+  "cv_precision_at_cutoff": 0.8204403918647255,
+  "cv_recall_at_cutoff": 0.5968253968253969,
+  "brier": 0.0879303312991344,
+  "features": {
+    "numeric": [
+      "person_age",
+      "person_income",
+      "person_emp_length",
+      "loan_amnt",
+      "loan_percent_income",
+      "cb_person_cred_hist_length"
+    ],
+    "categorical": [
+      "person_home_ownership",
+      "loan_intent",
+      "cb_person_default_on_file"
+    ]
+  },
+  "n_estimators": 300,
+  "all_chosen_settings": {
+    "LogReg (no SMOTE)": {
+      "C": 1
+    },
+    "LogReg + SMOTE": {
+      "C": 0.01
+    },
+    "Linear SVM (no SMOTE)": {
+      "C": 3
+    },
+    "Linear SVM + SMOTE": {
+      "C": 0.1
+    },
+    "SVM RBF (no SMOTE)": {
+      "C": 30,
+      "gamma": 0.1
+    },
+    "SVM RBF + SMOTE": {
+      "C": 100,
+      "gamma": 0.03
+    },
+    "Tree": {
+      "criterion": "entropy",
+      "max_depth": 15,
+      "min_samples_leaf": 20
+    },
+    "Random Forest": {
+      "min_samples_leaf": 2,
+      "max_features": null,
+      "max_depth": null,
+      "criterion": "gini"
+    }
+  }
+}
