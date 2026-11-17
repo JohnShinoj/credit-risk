@@ -62,15 +62,17 @@ set never influences them. Rows without a rate cannot be used to train or test t
 </div>
 
 <h2>Loans by grade</h2>
+<p>Calculated by us from the data: the 29,315 cleaned loans (training + test) that have a recorded interest rate
+(printed in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a>, Step 2).</p>
 <div class="table-wrap"><table>
-<tr><th>Grade</th><th class="num">Share of loans</th><th class="num">Average rate</th><th class="num">Default rate</th></tr>
-<tr><td>A</td><td class="num">33.0%</td><td class="num">7.3%</td><td class="num">10%</td></tr>
-<tr><td>B</td><td class="num">31.7%</td><td class="num">11.0%</td><td class="num">16%</td></tr>
-<tr><td>C</td><td class="num">20.1%</td><td class="num">13.5%</td><td class="num">21%</td></tr>
-<tr><td>D</td><td class="num">11.3%</td><td class="num">15.4%</td><td class="num">59%</td></tr>
-<tr><td>E</td><td class="num">3.0%</td><td class="num">17.0%</td><td class="num">65%</td></tr>
-<tr><td>F</td><td class="num">0.7%</td><td class="num">18.6%</td><td class="num">70%</td></tr>
-<tr><td>G</td><td class="num">0.2%</td><td class="num">20.3%</td><td class="num">98%</td></tr>
+<tr><th>Grade</th><th class="num">Loans</th><th class="num">Share of loans</th><th class="num">Average rate</th><th class="num">Default rate</th></tr>
+<tr><td>A</td><td class="num">9,712</td><td class="num">33.1%</td><td class="num">7.3%</td><td class="num">10.0%</td></tr>
+<tr><td>B</td><td class="num">9,335</td><td class="num">31.8%</td><td class="num">11.0%</td><td class="num">16.3%</td></tr>
+<tr><td>C</td><td class="num">5,807</td><td class="num">19.8%</td><td class="num">13.5%</td><td class="num">20.8%</td></tr>
+<tr><td>D</td><td class="num">3,308</td><td class="num">11.3%</td><td class="num">15.4%</td><td class="num">59.5%</td></tr>
+<tr><td>E</td><td class="num">880</td><td class="num">3.0%</td><td class="num">17.0%</td><td class="num">64.9%</td></tr>
+<tr><td>F</td><td class="num">214</td><td class="num">0.7%</td><td class="num">18.6%</td><td class="num">70.1%</td></tr>
+<tr><td>G</td><td class="num">59</td><td class="num">0.2%</td><td class="num">20.3%</td><td class="num">98.3%</td></tr>
 </table></div>
 <p>Rates rise steadily with the grade. The default rates jump sharply from C to D and reach 98% in grade G, which is extreme for
 real lending; we come back to this in <a href="analysis.html">Result analysis</a> and <a href="limitations.html">Limitations</a>.</p>
