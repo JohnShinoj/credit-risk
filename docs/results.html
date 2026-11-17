@@ -11,8 +11,8 @@
 <main>
 
 <h1>Results</h1>
-<p class="lead">The chosen model in every setting is a Random Forest, for default and for the interest rate. Test results match
-validation, so the models were not tuned to the validation folds.</p><div class="note"><b>The three settings compared on this site</b> (they differ only in what is known when the
+<p class="lead">The chosen model in every setting is a Random Forest, for default and for the interest rate. Every section below
+can be read on its own: what it shows, how to read it, and what it tells us.</p><div class="note"><b>The three settings compared on this site</b> (they differ only in what is known when the
 decision is made):<br>
 <span class="tag ref">Reference</span> a loan that is <b>already priced</b>: the applicant's grade and the interest rate are both known.<br>
 <span class="tag A">Pipeline A</span> a <b>graded applicant</b>: the applicant has a grade (A–G, a credit-history rating like a credit score), the interest rate is not set yet.<br>
@@ -20,6 +20,9 @@ decision is made):<br>
 <a href="index.html#why-three">Why we compare all three →</a></div>
 
 <h2>Final test set (6,482 applicants, used once)</h2>
+<p><b>What this is.</b> All choices (models, hyperparameters, cutoffs, calibration) were made with 5-fold cross-validation on the
+training set (<i>validation</i>). Only then was each setting's chosen model run <b>once</b> on the 20% test set: 6,482 applicants
+the models had never seen. This is the honest estimate of how the system would do on new applicants.</p>
 <div class="table-wrap"><table>
 <tr><th></th><th><span class="tag ref">Reference</span><br>rate + grade</th><th><span class="tag A">Pipeline A</span><br>grade</th><th><span class="tag B">Pipeline B</span><br>newcomer</th></tr>
 <tr><td>PD model (chosen on validation)</td><td>Random Forest, isotonic</td><td>Random Forest, isotonic</td><td>Random Forest, Platt</td></tr>
@@ -35,8 +38,27 @@ decision is made):<br>
 <tr><td><b>Rate R²</b> test (validation)</td><td>-</td><td class="num"><b>0.907</b> (0.905)</td><td class="num"><b>0.305</b> (0.305)</td></tr>
 <tr><td>Rate error (RMSE)</td><td>-</td><td class="num">±0.99 pp</td><td class="num">±2.70 pp</td></tr>
 </table></div>
+<div class="card">
+<p style="margin-top:0"><b>How to read the rows.</b></p>
+<ul>
+<li><b>PD model and cutoff:</b> the Random Forest gives each applicant a calibrated probability of default (PD); isotonic and
+Platt are the two calibration methods. Applicants with PD at or above the cutoff are declined.</li>
+<li><b>F1, precision, recall</b> (0 to 1, higher is better) judge the approve/decline decision: recall = share of defaulters
+caught, precision = share of declined applicants who really defaulted, F1 combines both.</li>
+<li><b>ROC-AUC</b> (0.5 = random, 1 = perfect): how well risky applicants are ranked above safe ones, whatever the cutoff.</li>
+<li><b>Brier and ECE</b> (lower is better) judge the probabilities themselves: Brier = average of (PD − outcome)²; ECE = average
+gap between predicted PD and the actual default rate.</li>
+<li><b>Rate R² and RMSE</b> judge the suggested interest rate: R² = share of rate differences explained; RMSE = typical error in
+percentage points (pp).</li>
+</ul>
+<p style="margin-bottom:0"><b>What it shows.</b> (1) The Reference and Pipeline A are practically equal: once the grade is known,
+also knowing the rate adds nothing. (2) Pipeline B, without the grade, is clearly weaker for both default and rate. (3) Test
+scores are close to validation scores (e.g. F1 0.837 vs 0.827), so the choices made on validation were not overfitted.</p>
+</div>
+
 <h3>Baselines: what if we used no model?</h3>
-<p>A score only means something next to the simplest possible answer:</p>
+<p>A score only means something next to the simplest possible answer. Each baseline below uses no information about the
+applicant at all:</p>
 <div class="table-wrap"><table>
 <tr><th>Baseline</th><th>Result</th><th>Why</th><th>Our models</th></tr>
 <tr><td>Say "everyone repays"</td><td class="num">accuracy 0.781, F1 0</td><td>78.1% of test applicants repaid, so this is "right"
@@ -46,23 +68,27 @@ every defaulter by 0.781: 0.219 × 0.781 = 0.171.</td><td class="num">Brier 0.05
 <tr><td>Give everyone the average rate</td><td class="num">RMSE 3.24 pp, R² 0</td><td>This is just the natural spread of rates.</td>
 <td class="num">±0.99 pp (A), ±2.70 pp (B)</td></tr>
 </table></div>
+<p><b>What it tells us:</b> every pipeline is far better than guessing. Even Pipeline B's Brier score is half the baseline's.</p>
 
 <h3>95% intervals: is the gap between A and B real?</h3>
 <p>The test set is one sample of 6,482 applicants; another sample would give slightly different scores. To measure this we used
 a <b>bootstrap</b>: draw 6,482 applicants from the test set <i>with replacement</i> (some appear twice, some not at all),
-recompute F1, and repeat 1,000 times. The middle 95% of those values is the interval. Pipeline A's lowest plausible F1 (0.821) is
-well above Pipeline B's highest (0.719), so <b>the intervals do not overlap and the gap is real, not luck</b>: the grade really
-helps. Reference (0.823–0.853) and A overlap almost completely, so knowing the rate on top of the grade adds nothing measurable.</p>
+recompute F1, and repeat 1,000 times. The middle 95% of those values is the interval: the range in which the score would
+plausibly fall for a different sample.</p>
+<p><b>What it tells us:</b> Pipeline A's lowest plausible F1 (0.821) is well above Pipeline B's highest (0.719), so <b>the
+intervals do not overlap and the gap is real, not luck</b>: the grade really helps. The Reference (0.823–0.853) and A overlap almost
+completely, so knowing the rate on top of the grade adds nothing measurable.</p>
 
 <h3>Confusion matrices and reliability diagram</h3>
-<figure><img src="figures/test_confusion_reliability.png" alt="Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data)." loading="lazy"><figcaption>Test set: confusion matrices at the frozen cutoffs, and the reliability diagram (all three PD curves lie on the diagonal, so the probabilities are calibrated on unseen data).</figcaption></figure>
-<p><b>How to read a confusion matrix.</b> Rows are what actually happened, columns are the model's decision at its frozen cutoff;
-"% of row" is the share of that actual group.</p>
+<figure><img src="figures/test_confusion_reliability.png" alt="Test set: confusion matrices at the frozen cutoffs (left three) and the reliability diagram (right)." loading="lazy"><figcaption>Test set: confusion matrices at the frozen cutoffs (left three) and the reliability diagram (right).</figcaption></figure>
+<p><b>How to read a confusion matrix.</b> It counts the four possible outcomes of the approve/decline decision. Rows are what
+actually happened, columns are the model's decision at its frozen cutoff; "% of row" is the share of that actual group.</p>
 <div class="table-wrap"><table>
 <tr><th></th><th>predicted repay (approve)</th><th>predicted default (decline)</th></tr>
 <tr><td><b>repaid</b></td><td>correct: good customer approved</td><td>error: good customer wrongly declined (lost business)</td></tr>
 <tr><td><b>defaulted</b></td><td>error: defaulter approved (lost money)</td><td>correct: defaulter declined</td></tr>
 </table></div>
+<p>The same numbers, turned into rates:</p>
 <div class="table-wrap"><table>
 <tr><th>Test set (1,418 defaulters, 5,064 repaid)</th><th><span class="tag ref">Reference</span></th><th><span class="tag A">Pipeline A</span></th><th><span class="tag B">Pipeline B</span></th></tr>
 <tr><td>Defaulters caught (recall)</td><td class="num">1,060 / 1,418 = 74.8%</td><td class="num">1,054 / 1,418 = 74.3%</td><td class="num">864 / 1,418 = 60.9%</td></tr>
@@ -71,6 +97,7 @@ helps. Reference (0.823–0.853) and A overlap almost completely, so knowing the
 <tr><td>Defaulters approved</td><td class="num">358</td><td class="num">364</td><td class="num">554</td></tr>
 <tr><td><b>Default rate among approved</b> (21.9% with no model)</td><td class="num">358 / 5,370 = 6.7%</td><td class="num">364 / 5,380 = 6.8%</td><td class="num">554 / 5,428 = 10.2%</td></tr>
 </table></div>
+<p><b>What it tells us:</b></p>
 <ul>
 <li>All three decline a similar number (about 17%), so about 83% are approved.</li>
 <li>With the grade, 96% of declines are real defaulters, and the default rate among approved applicants falls from 21.9% to 6.8%.</li>
@@ -79,28 +106,45 @@ about 190 more defaulters, because without the credit history it cannot tell the
 <li>The missed defaulters are mostly applicants who look safe (homeowners, small loans, high income): see
 <a href="analysis.html">Result analysis</a>, finding 5.</li>
 </ul>
-<p><b>How to read the reliability diagram.</b> The test applicants are sorted by predicted PD and split into 10 equal groups
-(about 650 each). Each dot is one group: x = its average predicted PD, y = the share who actually defaulted. On the dotted diagonal,
-predicted = actual. All three pipelines lie on it; the <b>ECE</b> (average distance from the diagonal, weighted by group size) is
-only 0.005 / 0.007 / 0.013, so a PD can be read as a real probability. Most dots sit below 0.25 or near 0.9: the forests are
-confident about most applicants. Pipeline B has a dot at 0.45, a group it is unsure about (and indeed 47% of them defaulted).</p>
+<p><b>How to read the reliability diagram.</b> It checks whether a PD can be taken at face value: when the model says "30%",
+do about 30% of those people default? The test applicants are sorted by predicted PD and split into 10 equal groups (about 650
+each). Each dot is one group: x = its average predicted PD, y = the share who actually defaulted. On the dotted diagonal,
+predicted = actual.</p>
+<p><b>What it tells us:</b> all three pipelines lie on the diagonal; the <b>ECE</b> (average distance from the diagonal, weighted
+by group size) is only 0.005 / 0.007 / 0.013, so a PD can be read as a real probability. Most dots sit below 0.25 or near 0.9: the
+forests are confident about most applicants. Pipeline B has a dot at 0.45, a group it is unsure about (and indeed 47% of them
+defaulted).</p>
 <div class="note"><b>Calibrated is not the same as accurate.</b> Pipeline B's probabilities are as honest as A's (both on the
 diagonal), but they are less sharp: more applicants get uncertain middle PDs. That is why B's F1 is lower and its Brier score is
 higher (Brier rewards both honesty and sharpness).</div>
 
 <h2>Every model compared (validation, interactive)</h2>
-<p>Pick a task and a metric. These are 5-fold cross-validation scores on the training set (the test set was not used to choose).</p>
+<p><b>What this is.</b> Before the final test, every model was scored with 5-fold cross-validation on the training set, in each
+of the three settings. This chart is how the final model was chosen; the test set was not used. Pick a task (default or
+interest rate) and a metric; each model has one bar per setting, coloured by setting.</p>
 <div class="controls">
 <span class="seg" id="task"><button data-v="clf" class="on">Default (8 classifiers)</button><button data-v="rate">Interest rate (5 regressors)</button></span>
 <label>Metric <select id="metric"></select></label>
 </div>
 <div id="cmpChart" class="chart"></div>
 <div class="table-wrap" id="cmpTable"></div>
-<div class="note">In every setting the ranking is the same: <b>Random Forest &gt; decision tree &gt; RBF SVM &gt; linear models</b>.
-SMOTE never improves F1. For rates, all five regressors are within 0.02 R² of each other in each pipeline.</div>
+<div class="note"><b>What it tells us.</b> In every setting the ranking is the same: <b>Random Forest &gt; decision tree &gt;
+RBF SVM &gt; linear models</b>, so the choice of the Random Forest does not depend on what is known about the applicant. SMOTE
+never improves F1. For rates, all five regressors are within 0.02 R² of each other in each pipeline: the information available
+matters far more than the choice of regressor.</div>
 
 <h2>Interest rates on the test set</h2>
-<figure><img src="figures/test_rate_scatter.png" alt="Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates." loading="lazy"><figcaption>Predicted vs actual rate on the test set. Pipeline A follows the diagonal grade by grade; Pipeline B predictions fall in two bands (mainly past default yes/no) and cannot reach very low or very high rates.</figcaption></figure>
+<figure><img src="figures/test_rate_scatter.png" alt="Predicted vs actual rate on the test set, one dot per applicant." loading="lazy"><figcaption>Predicted vs actual rate on the test set, one dot per applicant.</figcaption></figure>
+<p><b>How to read it.</b> Each dot is one test applicant: x = the rate they were actually charged, y = the rate our model
+suggests. A perfect model would put every dot on the dotted diagonal.</p>
+<p><b>What it tells us:</b></p>
+<ul>
+<li><span class="tag A">Pipeline A</span> follows the diagonal in steps, one step per grade: within a grade the suggestion is
+almost constant, because the grade decides most of the rate. Typical error ±0.99 pp.</li>
+<li><span class="tag B">Pipeline B</span> suggests rates in two flat bands (about 10% and about 14.5%), mainly split by whether
+the applicant has a past default. It cannot reach very low or very high rates: newcomers charged 6% and 20% get similar
+suggestions. Typical error ±2.70 pp.</li>
+</ul>
 
 <h2>Do the rates look real? (World Bank check)</h2>
 <div class="card">
@@ -116,11 +160,32 @@ customers. In real risk-based lending every borrower should be above the benchma
 Comparing premiums instead of raw rates removes the effect of the economy, so only the pricing of risk is left.
 Details in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a>.</p>
 </div>
-<figure><img src="figures/macro_context.png" alt="Solid lines: US prime rate and inflation from the World Bank. Dashed lines: each grade's average interest rate, calculated by us from the dataset (actual rates charged, not predictions). Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible." loading="lazy"><figcaption>Solid lines: US prime rate and inflation from the World Bank. Dashed lines: each grade's average interest rate, calculated by us from the dataset (actual rates charged, not predictions). Green years are plausible for these loans: in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible.</figcaption></figure>
+<figure><img src="figures/macro_context.png" alt="Solid lines: US prime rate and inflation from the World Bank. Dashed lines: each grade's average interest rate, calculated by us from the dataset (actual rates charged, not predictions). Green years are plausible for these loans." loading="lazy"><figcaption>Solid lines: US prime rate and inflation from the World Bank. Dashed lines: each grade's average interest rate, calculated by us from the dataset (actual rates charged, not predictions). Green years are plausible for these loans.</figcaption></figure>
+<p><b>How to read it.</b> Solid lines are the US economy by year (World Bank); dashed lines are each grade's average rate in our
+data, which has no dates, so they are flat. The green line is the benchmark we use (3.86%).</p>
+<p><b>What it tells us:</b> in 2000–01 and 2005–07 the prime rate was above the cheapest loans in the data, which is implausible
+(no lender charges its customers less than its safest rate), so those years are excluded. In the other (green) years every grade
+sits above the benchmark, and riskier grades further above it, as in real risk-based lending.</p>
 <div class="grid two">
-<figure><img src="figures/pipelineA_premium_vs_actual.png" alt="Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade." loading="lazy"><figcaption>Pipeline A: suggested premium matches the actual premium in every grade, but varies less within a grade.</figcaption></figure>
-<figure><img src="figures/pipelineB_premium_vs_actual.png" alt="Pipeline B: on average per PD band the suggestion is right (+6 to +8 pp), but individuals vary far more than the model can tell apart." loading="lazy"><figcaption>Pipeline B: on average per PD band the suggestion is right (+6 to +8 pp), but individuals vary far more than the model can tell apart.</figcaption></figure>
+<figure><img src="figures/pipelineA_premium_vs_actual.png" alt="Pipeline A: suggested vs actual premium per grade (approved test applicants)." loading="lazy"><figcaption>Pipeline A: suggested vs actual premium per grade (approved test applicants).</figcaption></figure>
+<figure><img src="figures/pipelineB_premium_vs_actual.png" alt="Pipeline B: suggested vs actual premium per PD band (approved test applicants)." loading="lazy"><figcaption>Pipeline B: suggested vs actual premium per PD band (approved test applicants).</figcaption></figure>
 </div>
+<p><b>How to read these box plots.</b> Only approved test applicants with a recorded rate are shown. For each group, grey is
+the premium actually charged and colour is the premium our model suggests. The line in a box is the median, the box holds the
+middle 50% of applicants and the whiskers most of the rest. A perfect model would make each coloured box look like its grey
+neighbour. Left (Pipeline A): groups are grades. Right (Pipeline B, no grade): groups are five equal-size bands of newcomer PD,
+from safest (1) to riskiest (5).</p>
+<p><b>What they tell us:</b></p>
+<ul>
+<li><span class="tag A">Pipeline A</span>: the medians match in every grade, and premiums climb from about +3.5 pp (A) to
+about +15 pp (F). The suggested boxes are narrower: within a grade the model gives nearly the same premium to everyone, while
+real premiums still vary. There is no grade G because almost all grade G applicants are declined (PD above the cutoff).</li>
+<li><span class="tag B">Pipeline B</span>: actual premiums are spread very widely (about +2 to +16 pp) in every PD band, while
+the suggestions stay between about +5 and +8 pp. On average per band the suggestion is right (+6 to +8 pp), slightly too low in
+the riskiest band; for individuals it can be far off, because the lender priced by grade, which a newcomer does not have.</li>
+<li>Actual premiums rise only from about +6 to +8 pp across the five PD bands, but from +3.5 to +15 pp across grades: the
+grade explains the pricing far better than the newcomer's PD (R² 0.91 vs 0.31).</li>
+</ul>
 
 <div class="pager"><a href="evaluation.html">← Evaluation</a><a href="explore.html">Explore →</a></div>
 </main>
