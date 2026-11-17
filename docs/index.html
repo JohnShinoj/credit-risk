@@ -26,6 +26,25 @@ what the lender already knows about the applicant.</p>
 </div>
 
 <div class="card">
+<h3 style="margin-top:0">How a decision is made</h3>
+<pre style="background:#f7f7f5;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px;margin:6px 0 10px">
+applicant ──► model ──► probability of default (PD), e.g. 0.12
+                              │
+              PD ≥ cutoff ?  ─┤── yes ──► DECLINE (no rate offered)
+                              │
+                              └── no ───► APPROVE ──► rate model ──► suggested interest rate, e.g. 11.4%</pre>
+<ul style="margin-bottom:0">
+<li><b>Probability of default (PD):</b> a calibrated probability from a Random Forest: among applicants given PD 0.30, about 30%
+actually default.</li>
+<li><b>Approve / decline:</b> decline when PD is at or above the <b>cutoff</b>. Each setting's cutoff was chosen on the training
+set as the one with the highest F1, then frozen: <span class="tag ref">Reference</span> 0.378, <span class="tag A">Pipeline A</span>
+0.367, <span class="tag B">Pipeline B</span> 0.388. On the test set this approves about 83% of applicants.</li>
+<li><b>Interest rate:</b> only approved applicants get a suggested rate (Pipelines A and B; in the Reference the rate is already set).</li>
+<li>You can move the cutoff yourself and browse individual decisions on the <a href="explore.html">Explore</a> tab.</li>
+</ul>
+</div>
+
+<div class="card">
 <h3 style="margin-top:0">What is a loan grade?</h3>
 <p>Before setting the price of a loan, the lender sorts each applicant into a <b>risk grade from A (safest) to G (riskiest)</b>,
 based on its own checks of the applicant (such as their credit record). The grade then largely decides the interest rate
