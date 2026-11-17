@@ -119,9 +119,17 @@ predicted = actual.</p>
 by group size) is only 0.005 / 0.007 / 0.013, so a PD can be read as a real probability. Most dots sit below 0.25 or near 0.9: the
 forests are confident about most applicants. Pipeline B has a dot at 0.45, a group it is unsure about (and indeed 47% of them
 defaulted).</p>
-<div class="note"><b>Calibrated is not the same as accurate.</b> Pipeline B's probabilities are as honest as A's (both on the
-diagonal), but they are less sharp: more applicants get uncertain middle PDs. That is why B's F1 is lower and its Brier score is
-higher (Brier rewards both honesty and sharpness).</div>
+<div class="note"><b>Calibrated is not the same as accurate.</b> A good PD needs two things:
+<ul style="margin:6px 0">
+<li><b>Calibration (honesty):</b> the numbers mean what they say. Among applicants given PD 0.30, about 30% really default.
+The reliability diagram checks this.</li>
+<li><b>Sharpness (decisiveness):</b> the PDs are pushed away from the average (0.22) towards 0 or 1, so the model clearly
+separates safe applicants (e.g. PD 0.02) from risky ones (e.g. PD 0.95) instead of giving many people an unsure middle value.</li>
+</ul>
+A model can be honest without being sharp: giving <i>everyone</i> PD 0.22 is perfectly calibrated (22% of everyone defaults),
+but useless, because it cannot tell anyone apart. Pipeline B's probabilities are as honest as A's (both lie on the diagonal),
+but they are less sharp: more applicants get uncertain middle PDs (like the group at 0.45). That is why B's F1 is lower and its
+Brier score is higher: the Brier score rewards both calibration and sharpness.</div>
 
 <h2>Every model compared (validation, interactive)</h2>
 <p><b>What this is.</b> Before the final test, every model was scored with 5-fold cross-validation on the training set, in each
