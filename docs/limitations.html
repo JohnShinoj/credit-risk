@@ -17,8 +17,8 @@
 <li><b>No loan dates.</b> We cannot study changes over time or link each loan to the economy when it was issued, as the proposal
 planned. Macro data was used for a plausibility check instead, with an inferred benchmark (average US prime rate over the years
 that fit the data).</li>
-<li><b>How the grade is produced is not documented.</b> Pipeline A, our main pricing pipeline, assumes the grade is available
-when someone applies (for example a shared credit rating). If the grade is only assigned by this lender after its own
+<li><b>How the grade is produced is not documented.</b> Pipeline A, our main pricing pipeline, assumes the grade is a universal
+credit-history rating available when someone applies (like a credit score such as CIBIL). If the grade is only assigned by this lender after its own
 assessment, Pipeline A applies only after that step, and Pipeline B is the realistic setting for new applicants. Pipeline A's
 rate accuracy (R² 0.91) also reflects this lender's own pricing and may be lower for other lenders.</li>
 <li><b>Country not documented.</b> US lending is assumed from the data's structure; the World Bank comparison depends on that.</li>
@@ -28,7 +28,11 @@ extreme default rates suggest the scores may be higher than on real loans.</li>
 (selection bias / reject inference), so the models learn from an already-filtered population.</li>
 <li><b>One dataset.</b> Performance on other lenders, countries or periods is untested. A direct check on another lender
 (e.g. Lending Club) was not possible because key inputs such as age are missing there.</li>
-<li><b>Information ceiling for newcomers.</b> Without credit-file information the rate can only be estimated to about ±2.7 pp.</li>
+<li><b>Information ceiling for newcomers.</b> Without credit-history information (the grade) the rate can only be estimated to about ±2.7 pp.</li>
+<li><b>The rate model copies past pricing.</b> It is trained on the rates this lender actually charged, so it suggests what
+similar borrowers paid, not a break-even or profit-maximising rate. The cutoff is chosen by F1, which treats a missed
+defaulter and a wrongly declined good borrower as equally costly; a cutoff based on money (loss on default vs. interest
+earned) would probably be stricter.</li>
 <li><b>Method details.</b> SMOTE was applied after one-hot encoding, so it interpolates categories (SMOTENC would be the
 cleaner variant); it never improved F1 here. The RBF SVM in Pipelines A and B was tuned on an 8,000-row subset only.
 The forest searches were randomized (15 combinations), not exhaustive.</li>

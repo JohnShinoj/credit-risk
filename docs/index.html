@@ -39,33 +39,42 @@ actually default.</li>
 <li><b>Approve / decline:</b> decline when PD is at or above the <b>cutoff</b>. Each setting's cutoff was chosen on the training
 set as the one with the highest F1, then frozen: <span class="tag ref">Reference</span> 0.378, <span class="tag A">Pipeline A</span>
 0.367, <span class="tag B">Pipeline B</span> 0.388. On the test set this approves about 83% of applicants.</li>
-<li><b>Interest rate:</b> only approved applicants get a suggested rate (Pipelines A and B; in the Reference the rate is already set).</li>
+<li><b>Interest rate:</b> only approved applicants get a suggested rate (Pipelines A and B; in the Reference the rate is already set).
+The rate model is a <b>Random Forest regressor</b> trained on past loans and the rates actually charged. It suggests the rate that
+<b>similar past borrowers paid</b>: in <span class="tag A">Pipeline A</span> it uses the grade + applicant details, in
+<span class="tag B">Pipeline B</span> the PD + applicant details (no grade). It learns from <b>all</b> past loans with a
+recorded rate, not only approved ones; the cutoff decides only <i>whether</i> a rate is offered. So it reproduces the lender's
+past pricing; it does not calculate a break-even or profit-maximising rate.</li>
 <li>You can move the cutoff yourself and browse individual decisions on the <a href="explore.html">Explore</a> tab.</li>
 </ul>
 </div>
 
 <div class="card">
 <h3 style="margin-top:0">What is a loan grade?</h3>
-<p>Before setting the price of a loan, the lender sorts each applicant into a <b>risk grade from A (safest) to G (riskiest)</b>,
-based on its own checks of the applicant (such as their credit record). The grade then largely decides the interest rate
+<p>Every applicant has a <b>risk grade from A (safest) to G (riskiest)</b>. The grade is a <b>combined evaluation of the
+applicant's credit history</b> (for example past defaults and repayment record), summarised in one letter, much like a
+credit score such as <b>CIBIL</b> in India or FICO in the US. The grade then largely decides the interest rate
 (averages we calculated from the dataset's 29,315 cleaned loans that have a recorded rate):</p>
 <div class="table-wrap"><table>
 <tr><th>Grade</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th><th class="num">E</th><th class="num">F</th><th class="num">G</th></tr>
 <tr><td>Average interest rate (calculated by us from the data)</td><td class="num">7.3%</td><td class="num">11.0%</td><td class="num">13.5%</td><td class="num">15.4%</td><td class="num">17.0%</td><td class="num">18.6%</td><td class="num">20.3%</td></tr>
 <tr><td>Share who defaulted (calculated by us from the data)</td><td class="num">10%</td><td class="num">16%</td><td class="num">21%</td><td class="num">60%</td><td class="num">65%</td><td class="num">70%</td><td class="num">98%</td></tr>
 </table></div>
-<p style="margin-bottom:0">So the grade is the <b>lender's own verdict</b> on how risky someone is. It is very informative, but a brand-new
-applicant does not have one until the lender has assessed them.</p>
+<p style="margin-bottom:0">Because it packs the whole credit history into one value, the grade is the most informative single
+input for the interest rate and adds a lot to default prediction. Like a credit score, we treat it as <b>universal and available
+when someone applies</b>. The dataset does not document how the grade was produced, so this is an assumption. Someone with no
+credit history yet (a newcomer) has no grade, which is the situation of Pipeline B.</p>
 </div>
 
 <h2>Three settings: what is known at decision time?</h2>
-<p>The dataset contains the lender's <b>grade</b> (A–G) and the <b>interest rate</b>. Both are decided <i>by the lender</i>,
-so a model may only use them if they would really be known when the prediction is made. That is why we built three settings:</p>
+<p>The dataset contains each loan's <b>grade</b> (A–G) and <b>interest rate</b>. The rate is set by the lender and the grade
+exists only once the applicant has a credit history, so a model may only use them if they would really be known when the
+prediction is made. That is why we built three settings:</p>
 
 <div class="table-wrap"><table>
 <tr><th>Setting</th><th>Who it is for</th><th>Known when the decision is made</th><th>Predicts</th><th>Notebooks</th></tr>
 <tr><td><span class="tag ref">Reference</span></td><td>A loan that is already priced (e.g. monitoring existing loans)</td><td>applicant details + <b>grade</b> + <b>interest rate</b></td><td>probability of default only (the rate is already set)</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04</a></td></tr>
-<tr><td><span class="tag A">Pipeline A</span> graded applicant</td><td>An applicant the lender has already graded A–G, rate not yet decided</td><td>applicant details + <b>grade</b></td><td>probability of default → approve/decline → interest rate</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08</a> (default), <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09</a> (rate)</td></tr>
+<tr><td><span class="tag A">Pipeline A</span> graded applicant</td><td>An applicant who already has a grade A–G (a credit-history rating), rate not yet decided</td><td>applicant details + <b>grade</b></td><td>probability of default → approve/decline → interest rate</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08</a> (default), <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09</a> (rate)</td></tr>
 <tr><td><span class="tag B">Pipeline B</span> newcomer</td><td>A brand-new applicant with no grade and no rate</td><td>applicant details only</td><td>probability of default → approve/decline → interest rate</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06</a> (default), <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07</a> (rate)</td></tr>
 </table></div>
 <p style="font-size:14px;color:var(--muted)">All three are evaluated together on the test set in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">notebook 11</a>;
@@ -77,8 +86,8 @@ for one stage, and each has a clear role:</p>
 <div class="table-wrap"><table>
 <tr><th>Pipeline</th><th>Role in this project</th></tr>
 <tr><td><span class="tag A">Pipeline A</span> graded applicant</td><td><b>Main pipeline for pricing.</b> Grade + details → PD → approve/decline →
-interest rate. This assumes the grade is <b>available when someone applies</b>, for example if it were a standard credit rating
-that any lender can look up (like a credit score), rather than a rating only this lender assigns after its own assessment.
+interest rate. This assumes the grade is <b>universal and available when someone applies</b>, like a credit score (e.g. CIBIL)
+that any lender can look up, rather than a rating only this lender assigns after its own assessment.
 The dataset does not say how the grade was produced, so this is an assumption.</td></tr>
 <tr><td><span class="tag B">Pipeline B</span> newcomer</td><td><b>Fallback</b> for applicants without a grade (for example no credit history yet).
 It also shows how much the grade is worth: without it, default prediction and pricing are much weaker. To see whether
@@ -90,8 +99,9 @@ this data allows (e.g. for checking loans already on the books), and it is where
 <p>Why keep them separate rather than build one model:</p>
 <div class="card">
 <ol style="margin:0">
-<li><b>A model may only use what is known when the decision is made.</b> The grade and the interest rate are decided by the
-lender. Using them for an applicant who has not been graded or priced yet would be cheating (information leakage), and the
+<li><b>A model may only use what is known when the decision is made.</b> The interest rate is decided by the
+lender, and a grade exists only for applicants with a credit history. Using them for an applicant who has no grade or has not
+been priced yet would be cheating (information leakage), and the
 results would look better than any real system could achieve. Each setting uses only what is truly available at its moment
 in the lending process.</li>
 <li><b>Each setting is a real situation a lender faces.</b> <span class="tag ref">Reference</span> checking the risk of loans
@@ -99,7 +109,7 @@ already on the books; <span class="tag A">Pipeline A</span> pricing an applicant
 deciding on a brand-new applicant (the situation of our interactive tools and of a real application form).</li>
 <li><b>Predicting the rate must not use the rate.</b> The interest-rate models are part of Pipelines A and B only, and their
 probability-of-default inputs come from models that never saw the rate; otherwise the answer would be hidden in the input.</li>
-<li><b>The gap between the settings is itself a finding.</b> Comparing them measures how much the lender's own information is
+<li><b>The gap between the settings is itself a finding.</b> Comparing them measures how much the grade and the rate are
 worth: Reference vs A shows what the interest rate adds once the grade is known (almost nothing); A vs B shows what the grade
 adds (a lot: default F1 0.84 → 0.70, rate R² 0.91 → 0.31). Note that Pipeline A's rate accuracy (R² 0.91) reflects how
 <i>this</i> lender priced its loans from its grade; another lender may follow the grade less closely.</li>
@@ -131,7 +141,7 @@ suggestion of 11% is typically off by about 2.7 points.</li>
 <li><b>ROC-AUC</b> (default, 0.5 to 1): how well risky applicants are ranked above safe ones; 0.5 is random.</li>
 </ul>
 </div>
-<div class="note good"><b>Main finding.</b> The lender's grade carries almost all the useful information. Knowing only the grade
+<div class="note good"><b>Main finding.</b> The grade, a one-letter summary of the applicant's credit history, carries almost all the useful information. Knowing only the grade
 (Pipeline A) predicts default as well as knowing grade and rate together, and explains 91% of the variation in rates. For a
 newcomer without a grade (Pipeline B), default prediction drops to F1 0.70 and only 30% of rate variation can be explained:
 the limit is the information available, not the choice of model.</div>

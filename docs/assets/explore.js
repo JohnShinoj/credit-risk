@@ -106,7 +106,7 @@
         <tr><td>Home / employment</td><td>${a.home} · ${a.emp == null ? "unknown" : a.emp + " years"}</td></tr>
         <tr><td>Loan</td><td>$${Math.round(a.amount).toLocaleString()} for ${a.intent.toLowerCase()} · ${Math.round(a.lti * 100)}% of income</td></tr>
         <tr><td>Credit history</td><td>${a.hist} years · past default on file: ${a.pastdef === "Y" ? "yes" : "no"}</td></tr>
-        <tr><td>Lender's grade / rate</td><td>${a.grade} · ${a.rate == null ? "not recorded" : a.rate.toFixed(2) + "%"}</td></tr>
+        <tr><td>Grade / rate</td><td>${a.grade} · ${a.rate == null ? "not recorded" : a.rate.toFixed(2) + "%"}</td></tr>
       </table></div>
       <div class="table-wrap"><table>
         <tr><th>Setting</th><th class="num">PD</th><th>Decision</th><th>Suggested rate</th></tr>

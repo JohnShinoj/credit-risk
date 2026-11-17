@@ -11,7 +11,8 @@ ES 335 course project · John Shinoj (25110151)
    cutoff (classification; main metric F1, plus Brier score for the probabilities).
 2. **Interest rate:** suggests an interest rate for approved applicants (regression; RMSE and R²).
 
-Because the lender's **grade** and **interest rate** are themselves lender decisions, the project compares three settings that
+The **grade** (A–G) is a one-letter rating of the applicant's credit history, like a credit score such as CIBIL, and the
+**interest rate** is set by the lender mainly from it. Because neither is known for every applicant, the project compares three settings that
 differ in what is known when the decision is made:
 
 | Setting | Known at decision time | Default model | Rate model |

@@ -36,7 +36,7 @@ matches US marketplace lending, so amounts are read as US dollars.</p>
 <tr><td><code>loan_percent_income</code></td><td>loan amount ÷ income (loan-to-income)</td><td>numeric</td><td>all</td></tr>
 <tr><td><code>cb_person_default_on_file</code></td><td>a past default on the credit-bureau file (Y/N)</td><td>category</td><td>all</td></tr>
 <tr><td><code>cb_person_cred_hist_length</code></td><td>length of credit history (years)</td><td>numeric</td><td>all</td></tr>
-<tr><td><code>loan_grade</code></td><td>lender's risk grade A (best) … G (worst)</td><td>category</td><td>Reference, A; target of the grade classifier in B</td></tr>
+<tr><td><code>loan_grade</code></td><td>risk grade A (best) … G (worst): a one-letter rating of the applicant's credit history</td><td>category</td><td>Reference, A; target of the grade classifier in B</td></tr>
 <tr><td><code>loan_int_rate</code></td><td>interest rate charged (%), 3,094 missing after cleaning</td><td>numeric</td><td>input in Reference; <b>target</b> of the rate models</td></tr>
 <tr><td><code>loan_status</code></td><td>1 = defaulted, 0 = repaid</td><td>binary</td><td><b>target</b> of the default models; never an input</td></tr>
 </table></div>
