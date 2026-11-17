@@ -81,7 +81,9 @@ interest rate. This assumes the grade is <b>available when someone applies</b>, 
 that any lender can look up (like a credit score), rather than a rating only this lender assigns after its own assessment.
 The dataset does not say how the grade was produced, so this is an assumption.</td></tr>
 <tr><td><span class="tag B">Pipeline B</span> newcomer</td><td><b>Fallback</b> for applicants without a grade (for example no credit history yet).
-It also shows how much the grade is worth: without it, default prediction and pricing are much weaker.</td></tr>
+It also shows how much the grade is worth: without it, default prediction and pricing are much weaker. To see whether
+we could get a higher score, we also tried predicting the grade first from the applicant's details and then the rate (a two-stage
+model). It did not increase the score (rate R² 0.303 vs 0.305 without it): the grade was guessed correctly only 49% of the time.</td></tr>
 <tr><td><span class="tag ref">Reference</span> already-priced loan</td><td><b>Upper bound and model selection.</b> With grade and rate both known it shows the best
 this data allows (e.g. for checking loans already on the books), and it is where all the models were first compared.</td></tr>
 </table></div>

@@ -85,7 +85,10 @@ that fold's outcomes. The version with the lowest Brier score was kept (<a href=
 <tr><td>Ridge, Lasso</td><td>candidates (shrink coefficients; Lasso can drop inputs)</td><td>α</td></tr>
 <tr><td>Random Forest regressor</td><td>candidate (non-linear)</td><td>depth, leaf size, max_features</td></tr>
 <tr><td>Gradient boosting regressor</td><td>added to try to improve R²</td><td>learning rate, trees, leaves, L2</td></tr>
-<tr><td>Two-stage: predict the grade, then the rate</td><td>Pipeline B only (a newcomer has no grade)</td><td>uses grade probabilities from a classifier</td></tr>
+<tr><td>Two-stage: predict the grade, then the rate</td><td>Pipeline B only (a newcomer has no grade); tried to see whether it
+could raise the R². Stage 1, a Random Forest
+classifier predicts the grade (A–G) from the applicant's details and PD; stage 2, the rate models use those grade probabilities
+as extra inputs. Out-of-fold, so no leakage. Result: R² 0.303 vs 0.305 without it.</td><td>stage 1: 300 trees, leaf size 5</td></tr>
 </table></div>
 
 <h2>What each setting may use</h2>
