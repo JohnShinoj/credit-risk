@@ -88,11 +88,13 @@ settings in <code>reports/</code>), so the order matters. Times are for a 12-cor
 <tr><td>10</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10_results_summary.ipynb</a></td><td>all validation results in one place</td><td>~1 min</td></tr>
 <tr><td>11</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a></td><td><b>final test set, used once</b>; error analysis; saves per-applicant test predictions</td><td>~1 min</td></tr>
 <tr><td>12</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12_macro_check.ipynb</a></td><td>World Bank check of the interest rates; website figures</td><td>~1 min</td></tr>
+<tr><td>13</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/13_website_checks.ipynb" target="_blank" rel="noopener">13_website_checks.ipynb</a></td><td>recomputes the simple counts and shares quoted on this website (no new models)</td><td>&lt; 1 min</td></tr>
 </table></div>
 
-<h3>4. Rebuild the website data</h3>
+<h3>4. Rebuild the website</h3>
 <p>Run <code>python src/export_site_data.py</code>. It reads the notebooks' saved results and writes the website's data files
-(<code>docs/data/</code>) and figures (<code>docs/figures/</code>). To view the site locally:
+(<code>docs/data/</code>) and figures (<code>docs/figures/</code>). Then run <code>python src/build_site.py docs</code>, which
+writes the eight HTML pages. To view the site locally:
 <code>python -m http.server 8765 --directory docs</code>, then open <code>http://localhost:8765</code>.</p>
 
 <h3>Why the results come out the same every time</h3>

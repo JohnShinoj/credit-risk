@@ -56,6 +56,8 @@ also knowing the rate adds nothing. (2) Pipeline B, without the grade, is clearl
 scores are close to validation scores (e.g. F1 0.837 vs 0.827), so the choices made on validation were not overfitted.</p>
 </div>
 
+<p>Full tables: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_headline.csv" target="_blank" rel="noopener">reports/final_test_headline.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_pd.csv" target="_blank" rel="noopener">reports/final_test_pd.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_rate.csv" target="_blank" rel="noopener">reports/final_test_rate.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_errors_by_segment.csv" target="_blank" rel="noopener">reports/final_test_errors_by_segment.csv</a>; code: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>. The confusion-matrix counts below are recomputed in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/13_website_checks.ipynb" target="_blank" rel="noopener">13_website_checks.ipynb</a>.</p>
+
 <h3>Baselines: what if we used no model?</h3>
 <p>A score only means something next to the simplest possible answer. Each baseline below uses no information about the
 applicant at all:</p>
@@ -128,6 +130,7 @@ interest rate) and a metric; each model has one bar per setting, coloured by set
 </div>
 <div id="cmpChart" class="chart"></div>
 <div class="table-wrap" id="cmpTable"></div>
+<p>Full tables: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/all_classification_scores.csv" target="_blank" rel="noopener">reports/all_classification_scores.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/all_rate_scores.csv" target="_blank" rel="noopener">reports/all_rate_scores.csv</a>; summary notebook: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10_results_summary.ipynb</a>.</p>
 <div class="note"><b>What it tells us.</b> In every setting the ranking is the same: <b>Random Forest &gt; decision tree &gt;
 RBF SVM &gt; linear models</b>, so the choice of the Random Forest does not depend on what is known about the applicant. SMOTE
 never improves F1. For rates, all five regressors are within 0.02 R² of each other in each pipeline: the information available

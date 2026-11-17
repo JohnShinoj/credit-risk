@@ -55,6 +55,10 @@ You can move the cutoff yourself on the <a href="explore.html">Explore</a> tab.<
 <tr><td><b>R²</b> (rates)</td><td>share of the variation in rates explained</td><td>comparable across pipelines (0 = no better than the average rate)</td></tr>
 <tr><td>Accuracy</td><td>share of correct predictions</td><td>reported only next to its 78% "everyone repays" baseline; misleading on its own</td></tr>
 </table></div>
+<div class="note"><b>Details in the repository.</b> The split: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a>. The folds, the exact cutoff search and
+the calibration: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>make_cv</code>, <code>best_cutoff</code>, <code>crossfit_calibrate</code>).
+Calibration of every model: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04_probability_of_default.ipynb</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a>,
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a>. The one-time test: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>.</div>
 
 <div class="pager"><a href="method.html">← Method</a><a href="results.html">Results →</a></div>
 </main>

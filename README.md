@@ -27,9 +27,10 @@ differ in what is known when the decision is made:
 ## Repository layout
 
 ```
-notebooks/      12 Jupyter notebooks, run in order (see below)
+notebooks/      13 Jupyter notebooks, run in order (see below), saved with all outputs
 src/credit.py   shared code: data loading, the 5 CV folds, preprocessing pipeline, exact cutoff search, calibration
 src/export_site_data.py   exports the website's data and figures from the notebooks' saved outputs
+src/build_site.py         builds the website's 8 HTML pages (all page text is in this file)
 reports/        chosen settings (JSON) and result tables (CSV) written by the notebooks; reports/figures/ = figures
 docs/           the website (GitHub Pages): HTML pages, assets/, data/ (JSON exported from reports), figures/
 data/           NOT in the repository (git-ignored); created by notebook 01 and later notebooks
@@ -78,9 +79,43 @@ Later notebooks read files written by earlier ones. Times are on a 12-core lapto
 | 10 | `10_results_summary.ipynb` | all validation results in one place | ~1 min |
 | 11 | `11_final_test.ipynb` | **final test set, used once**; error analysis; saves per-applicant test predictions | ~1 min |
 | 12 | `12_macro_check.ipynb` | World Bank API check of the interest rates; website figures | ~1 min |
+| 13 | `13_website_checks.ipynb` | recomputes the simple counts and shares quoted on the website (no new models) | < 1 min |
 
-Then rebuild the website data: `python src/export_site_data.py`. To view the site locally:
-`python -m http.server 8765 --directory docs` and open http://localhost:8765.
+Then rebuild the website:
+
+```bash
+python src/export_site_data.py      # data (docs/data/) and figures (docs/figures/) from the saved results
+python src/build_site.py docs       # the 8 HTML pages
+python -m http.server 8765 --directory docs   # view locally at http://localhost:8765
+```
+
+## Preprocessing and data split (exact)
+
+* **Cleaning** (notebook 01): 32,581 raw rows → remove 165 exact duplicates, 5 applicants older than 100, and 2 with an impossible
+  employment length (over 60 years, or starting work before age 14) → **32,409 loans**.
+* **Split** (notebook 01): stratified on `loan_status`, 80/20, `random_state=42` → `train.csv` (25,927) and `test.csv` (6,482),
+  saved once and reused by every notebook.
+* **Preprocessing** (`src/credit.make_preprocess`, inside every model pipeline, fitted on training folds only): numeric columns →
+  median imputation + standardisation; categorical columns (home ownership, loan purpose, past default, grade) → one-hot encoding.
+  Optional SMOTE runs after preprocessing, on the training folds only.
+* **Inputs per setting** (`src/credit.py`): Reference = all columns; Pipeline A = all except `loan_int_rate`;
+  Pipeline B = all except `loan_int_rate` and `loan_grade`.
+
+## Where to find each experiment
+
+| Experiment | Notebook | Saved results |
+|---|---|---|
+| Logistic regression, SMOTE vs no SMOTE, cutoff tuning | 02 | `reports/pd_summary.csv` |
+| Linear SVM (soft margin, C sweep), RBF SVM (C/γ grid on an 8,000-row subset; confirmed on the full training set in 02) | 02, 06, 08 | `reports/all_classification_scores.csv` |
+| Decision tree (depth curve, 30-combination grid) | 03, 06, 08 | `reports/decision_tree_choice.json` |
+| Bagging vs Random Forest, number of trees, randomized search, importance | 05, 06, 08 | `reports/random_forest_choice.json` |
+| Calibration (raw / Platt / isotonic) for every model | 04, 06, 08 | `reports/pd_summary.csv`, `applicant_pd_summary.csv`, `graded_pd_summary.csv` |
+| Rate models (linear, Ridge, Lasso, Random Forest, gradient boosting) | 07, 09 | `reports/rate_model_validation.csv`, `rate_model_with_grade_validation.csv` |
+| Two-stage model (predict the grade, then the rate) | 07 | `reports/rate_model_validation.csv` (inputs "PD + details + predicted grade") |
+| All validation results side by side | 10 | `reports/all_classification_scores.csv`, `all_rate_scores.csv`, `headline_validation.csv` |
+| Final test (once), bootstrap intervals, error analysis | 11 | `reports/final_test_*.csv` |
+| World Bank check | 12 | `reports/figures/` |
+| Numbers quoted on the website | 13 | (printed in the notebook) |
 
 **Reproducibility notes.** All randomness uses seed 42. The train/test split is created once (notebook 01) and saved; every model
 uses the same 5 stratified folds (`src/credit.make_cv`). All learned preprocessing (imputation, scaling, encoding, SMOTE) sits

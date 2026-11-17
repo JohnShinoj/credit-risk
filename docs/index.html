@@ -58,7 +58,7 @@ credit score such as <b>CIBIL</b> in India or FICO in the US. The grade then lar
 <div class="table-wrap"><table>
 <tr><th>Grade</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th><th class="num">E</th><th class="num">F</th><th class="num">G</th></tr>
 <tr><td>Average interest rate (calculated by us from the data)</td><td class="num">7.3%</td><td class="num">11.0%</td><td class="num">13.5%</td><td class="num">15.4%</td><td class="num">17.0%</td><td class="num">18.6%</td><td class="num">20.3%</td></tr>
-<tr><td>Share who defaulted (calculated by us from the data)</td><td class="num">10%</td><td class="num">16%</td><td class="num">21%</td><td class="num">60%</td><td class="num">65%</td><td class="num">70%</td><td class="num">98%</td></tr>
+<tr><td>Share who defaulted (calculated by us from the data)</td><td class="num">10%</td><td class="num">16%</td><td class="num">21%</td><td class="num">59%</td><td class="num">65%</td><td class="num">70%</td><td class="num">98%</td></tr>
 </table></div>
 <p style="margin-bottom:0">Because it packs the whole credit history into one value, the grade is the most informative single
 input for the interest rate and adds a lot to default prediction. Like a credit score, we treat it as <b>universal and available
@@ -159,6 +159,19 @@ everyone gives Brier 0.171; guessing the average interest rate gives an error of
 <tr><td><a href="analysis.html">Result analysis</a></td><td>Why each result happens, in plain words, with the evidence</td></tr>
 <tr><td><a href="limitations.html">Limitations &amp; reproduce</a></td><td>What the results do not show, how to rerun everything, AI-use disclosure, citations</td></tr>
 </table></div>
+<div class="card">
+<h3 style="margin-top:0">Check everything in the repository</h3>
+<p>This site summarises the work; the repository <a href="https://github.com/JohnShinoj/credit-risk" target="_blank" rel="noopener">https://github.com/JohnShinoj/credit-risk</a> lets you check it.
+Main parts:</p>
+<ul style="margin-bottom:0">
+<li><a href="https://github.com/JohnShinoj/credit-risk/blob/main/README.md" target="_blank" rel="noopener">README.md</a>: setup and run steps, data access, AI-use disclosure, citations</li>
+<li><a href="https://github.com/JohnShinoj/credit-risk/tree/main/notebooks" target="_blank" rel="noopener">notebooks/</a>: the 13 notebooks, run in order, with all outputs saved</li>
+<li><a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a>: the exact preprocessing, the 5 cross-validation folds, the cutoff search and calibration used everywhere</li>
+<li><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a>: cleaning and the exact train/test split (saved once, seed 42)</li>
+<li><a href="https://github.com/JohnShinoj/credit-risk/tree/main/reports" target="_blank" rel="noopener">reports/</a>: every chosen setting (JSON) and every result table (CSV), including all extra experiments</li>
+<li><a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/build_site.py" target="_blank" rel="noopener">src/build_site.py</a> and <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/export_site_data.py" target="_blank" rel="noopener">src/export_site_data.py</a>: build this website from the saved results</li>
+</ul>
+</div>
 
 <div class="pager"><span></span><a href="data.html">Data →</a></div>
 </main>
