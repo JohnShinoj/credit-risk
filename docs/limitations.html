@@ -17,6 +17,10 @@
 <li><b>No loan dates.</b> We cannot study changes over time or link each loan to the economy when it was issued, as the proposal
 planned. Macro data was used for a plausibility check instead, with an inferred benchmark (average US prime rate over the years
 that fit the data).</li>
+<li><b>How the grade is produced is not documented.</b> Pipeline A, our main pricing pipeline, assumes the grade is available
+when someone applies (for example a shared credit rating). If the grade is only assigned by this lender after its own
+assessment, Pipeline A applies only after that step, and Pipeline B is the realistic setting for new applicants. Pipeline A's
+rate accuracy (R² 0.91) also reflects this lender's own pricing and may be lower for other lenders.</li>
 <li><b>Country not documented.</b> US lending is assumed from the data's structure; the World Bank comparison depends on that.</li>
 <li><b>Possibly partly simulated data.</b> Rules without exceptions (100%-default groups, no past defaults in grades A–B) and
 extreme default rates suggest the scores may be higher than on real loans.</li>
