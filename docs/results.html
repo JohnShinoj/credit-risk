@@ -59,6 +59,7 @@ scores are close to validation scores (e.g. F1 0.837 vs 0.827), so the choices m
 <p>Full tables: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_headline.csv" target="_blank" rel="noopener">reports/final_test_headline.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_pd.csv" target="_blank" rel="noopener">reports/final_test_pd.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_rate.csv" target="_blank" rel="noopener">reports/final_test_rate.csv</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_errors_by_segment.csv" target="_blank" rel="noopener">reports/final_test_errors_by_segment.csv</a>; code: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>. The confusion-matrix counts below are recomputed in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/13_website_checks.ipynb" target="_blank" rel="noopener">13_website_checks.ipynb</a>.</p>
 
 <h3>Baselines: what if we used no model?</h3>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a></p>
 <p>A score only means something next to the simplest possible answer. Each baseline below uses no information about the
 applicant at all:</p>
 <div class="table-wrap"><table>
@@ -73,6 +74,7 @@ every defaulter by 0.781: 0.219 × 0.781 = 0.171.</td><td class="num">Brier 0.05
 <p><b>What it tells us:</b> every pipeline is far better than guessing. Even Pipeline B's Brier score is half the baseline's.</p>
 
 <h3>95% intervals: is the gap between A and B real?</h3>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a> (<code>bootstrap_ci</code>, 1,000 resamples)</p>
 <p>The test set is one sample of 6,482 applicants; another sample would give slightly different scores. To measure this we used
 a <b>bootstrap</b>: draw 6,482 applicants from the test set <i>with replacement</i> (some appear twice, some not at all),
 recompute F1, and repeat 1,000 times. The middle 95% of those values is the interval: the range in which the score would
@@ -82,6 +84,7 @@ intervals do not overlap and the gap is real, not luck</b>: the grade really hel
 completely, so knowing the rate on top of the grade adds nothing measurable.</p>
 
 <h3>Confusion matrices and reliability diagram</h3>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>; counts recomputed in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/13_website_checks.ipynb" target="_blank" rel="noopener">13_website_checks.ipynb</a></p>
 <figure><img src="figures/test_confusion_reliability.png" alt="Test set: confusion matrices at the frozen cutoffs (left three) and the reliability diagram (right)." loading="lazy"><figcaption>Test set: confusion matrices at the frozen cutoffs (left three) and the reliability diagram (right).</figcaption></figure>
 <p><b>How to read a confusion matrix.</b> It counts the four possible outcomes of the approve/decline decision. Rows are what
 actually happened, columns are the model's decision at its frozen cutoff; "% of row" is the share of that actual group.</p>
@@ -137,6 +140,7 @@ never improves F1. For rates, all five regressors are within 0.02 R² of each ot
 matters far more than the choice of regressor.</div>
 
 <h2>Interest rates on the test set</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>; table: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_rate.csv" target="_blank" rel="noopener">reports/final_test_rate.csv</a></p>
 <figure><img src="figures/test_rate_scatter.png" alt="Predicted vs actual rate on the test set, one dot per applicant." loading="lazy"><figcaption>Predicted vs actual rate on the test set, one dot per applicant.</figcaption></figure>
 <p><b>How to read it.</b> Each dot is one test applicant: x = the rate they were actually charged, y = the rate our model
 suggests. A perfect model would put every dot on the dotted diagonal.</p>

@@ -25,6 +25,7 @@ matches US marketplace lending, so amounts are read as US dollars.</p>
 </div>
 
 <h2>Variables</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a></p>
 <div class="table-wrap"><table>
 <tr><th>Variable</th><th>Meaning</th><th>Type</th><th>Used in</th></tr>
 <tr><td><code>person_age</code></td><td>applicant's age (years)</td><td>numeric</td><td>all</td></tr>
@@ -42,6 +43,7 @@ matches US marketplace lending, so amounts are read as US dollars.</p>
 </table></div>
 
 <h2>Quality checks and cleaning</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a> (Section 1: cleaning)</p>
 <div class="table-wrap"><table>
 <tr><th>Step</th><th class="num">Rows left</th><th>Reason</th></tr>
 <tr><td>Raw data</td><td class="num">32,581</td><td></td></tr>
@@ -54,6 +56,7 @@ median <i>inside each cross-validation fold</i>, learned from training rows only
 set never influences them. Rows without a rate cannot be used to train or test the rate models (nothing to learn from).</div>
 
 <h2>Class balance and the train/test split</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a> (split); folds: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>make_cv</code>)</p>
 <div class="grid two">
 <div class="card"><p><b>21.9% of applicants defaulted</b> (78.1% repaid). This is a moderate imbalance: a model that predicts
 "everyone repays" is 78% accurate but useless, which is why accuracy is not our main metric.</p></div>

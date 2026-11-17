@@ -99,6 +99,7 @@ what the lender already knows about the applicant.</p>
 
 <div class="card">
 <h3 style="margin-top:0">How a decision is made</h3>
+<p class="src">Source: {nb("11_final_test.ipynb")} (decisions on the test set); cutoff search: {repo("src/credit.py")} (<code>best_cutoff</code>)</p>
 <pre style="background:#f7f7f5;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px;margin:6px 0 10px">
 applicant ──► model ──► probability of default (PD), e.g. 0.12
                               │
@@ -145,6 +146,7 @@ prediction is made. That is why we built three settings:</p>
 {SETTINGS_TABLE}
 
 <h2 id="why-three">Why compare all three?</h2>
+<p class="src">Source: pipelines in {nb("06_applicant_only_models.ipynb", "nb 06")}–{nb("09_interest_rate_with_grade.ipynb", "09")}; two-stage grade model: {nb("07_interest_rate_regression.ipynb")}</p>
 <p>A lender meets applicants at different stages, and what is known about them differs. Each pipeline answers the question
 for one stage, and each has a clear role:</p>
 <div class="table-wrap"><table>
@@ -183,6 +185,7 @@ it is where all the models were first compared before the choice was confirmed i
 </div>
 
 <h2>Headline results (final test set, used once)</h2>
+<p class="src">Source: {nb("11_final_test.ipynb")}; table: {repo("reports/final_test_headline.csv")}</p>
 <div class="grid three">
 <div class="card kpi"><span class="tag ref">Reference</span><div class="v">0.838</div><div class="l">default F1 (Random Forest)<br>Brier 0.052 · ROC-AUC 0.942</div></div>
 <div class="card kpi"><span class="tag A">Pipeline A</span><div class="v">0.837 · R² 0.907</div><div class="l">default F1 · interest-rate R²<br>rate error ±0.99 pp</div></div>
@@ -255,6 +258,7 @@ matches US marketplace lending, so amounts are read as US dollars.</p>
 </div>
 
 <h2>Variables</h2>
+<p class="src">Source: {nb("01_clean_split.ipynb")}</p>
 <div class="table-wrap"><table>
 <tr><th>Variable</th><th>Meaning</th><th>Type</th><th>Used in</th></tr>
 <tr><td><code>person_age</code></td><td>applicant's age (years)</td><td>numeric</td><td>all</td></tr>
@@ -272,6 +276,7 @@ matches US marketplace lending, so amounts are read as US dollars.</p>
 </table></div>
 
 <h2>Quality checks and cleaning</h2>
+<p class="src">Source: {nb("01_clean_split.ipynb")} (Section 1: cleaning)</p>
 <div class="table-wrap"><table>
 <tr><th>Step</th><th class="num">Rows left</th><th>Reason</th></tr>
 <tr><td>Raw data</td><td class="num">32,581</td><td></td></tr>
@@ -284,6 +289,7 @@ median <i>inside each cross-validation fold</i>, learned from training rows only
 set never influences them. Rows without a rate cannot be used to train or test the rate models (nothing to learn from).</div>
 
 <h2>Class balance and the train/test split</h2>
+<p class="src">Source: {nb("01_clean_split.ipynb")} (split); folds: {repo("src/credit.py")} (<code>make_cv</code>)</p>
 <div class="grid two">
 <div class="card"><p><b>21.9% of applicants defaulted</b> (78.1% repaid). This is a moderate imbalance: a model that predicts
 "everyone repays" is 78% accurate but useless, which is why accuracy is not our main metric.</p></div>
@@ -314,6 +320,7 @@ page("method.html", "Method", f"""
 <p class="lead">How the data is prepared, why, and which models were compared, for default prediction and for interest-rate prediction.</p>
 
 <h2>Preprocessing, and why</h2>
+<p class="src">Source: {repo("src/credit.py")} (<code>make_preprocess</code>, <code>make_pipeline</code>)</p>
 <div class="table-wrap"><table>
 <tr><th>Step</th><th>Applied to</th><th>Why</th></tr>
 <tr><td>Median imputation</td><td>employment length, interest rate (where it is an input)</td><td>fills gaps without being pulled by extreme values (income and loan amounts are right-skewed)</td></tr>
@@ -352,6 +359,7 @@ one cross-validation round (repeated 5 times, each fold used once for validation
 </table></div>
 
 <h2>Models for default (classification)</h2>
+<p class="src">Source: {nb("02_probability_of_default.ipynb", "nb 02")}, {nb("03_decision_trees.ipynb", "03")}, {nb("05_random_forest.ipynb", "05")}, {nb("06_applicant_only_models.ipynb", "06")}, {nb("08_graded_applicant_models.ipynb", "08")}; all scores: {repo("reports/all_classification_scores.csv")}</p>
 <p>The same five model types were compared in <b>all three settings</b> (Reference: notebooks 02, 03, 05; Pipeline A: notebook 08;
 Pipeline B: notebook 06), each re-tuned for its own inputs.</p>
 <div class="table-wrap"><table>
@@ -373,6 +381,7 @@ that fold's outcomes. The version with the lowest Brier score was kept ({nb("04_
 {nb("06_applicant_only_models.ipynb")}, {nb("08_graded_applicant_models.ipynb")}).</p>
 
 <h2>Models for the interest rate (regression)</h2>
+<p class="src">Source: {nb("07_interest_rate_regression.ipynb", "nb 07")} (Pipeline B), {nb("09_interest_rate_with_grade.ipynb", "nb 09")} (Pipeline A); all scores: {repo("reports/all_rate_scores.csv")}</p>
 <div class="table-wrap"><table>
 <tr><th>Model</th><th>Role</th><th>Tuned</th></tr>
 <tr><td>Predict the average rate</td><td>floor: anything useful must beat it</td><td>-</td></tr>
@@ -387,6 +396,7 @@ as extra inputs. Out-of-fold, so no leakage. Result: R² 0.303 vs 0.305 without 
 </table></div>
 
 <h2>What each setting may use</h2>
+<p class="src">Source: input lists in {repo("src/credit.py")} (<code>NUM_COLS</code>, <code>APPLICANT_NUM_COLS</code>, ...)</p>
 <div class="table-wrap"><table>
 <tr><th>Setting</th><th>Default-model inputs</th><th>Rate-model inputs</th></tr>
 <tr><td><span class="tag ref">Reference</span></td><td>details + grade + rate</td><td>none (rate known)</td></tr>
@@ -405,6 +415,7 @@ page("evaluation.html", "Evaluation", f"""
 <p class="lead">All choices were made on the training set with cross-validation; the test set was used exactly once, at the end.</p>
 
 <h2>Split, cross-validation and the test set</h2>
+<p class="src">Source: {nb("01_clean_split.ipynb")} (split); {repo("src/credit.py")} (<code>make_cv</code>); {nb("11_final_test.ipynb")} (test)</p>
 <pre style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px">
 32,409 applicants
 ├── TEST 20% (6,482) ───────────── locked; used once, in notebook 11, after every choice was frozen
@@ -422,6 +433,7 @@ page("evaluation.html", "Evaluation", f"""
 </ul>
 
 <h2>Choosing the decision cutoff</h2>
+<p class="src">Source: {repo("src/credit.py")} (<code>f1_curve</code>, <code>best_cutoff</code>); worked example in {nb("02_probability_of_default.ipynb")}</p>
 <p>A model says "default" when its PD is at or above a <b>cutoff</b>. The default 0.5 is not best when only 22% default. We
 tried <b>every distinct out-of-fold score</b> as the cutoff (an exact search, ~25,000 candidates) and kept the one with the highest F1,
 then checked it beat 0.5 in each fold. The chosen cutoffs are about 0.37–0.39 on the calibrated PD scale.
@@ -493,6 +505,7 @@ scores are close to validation scores (e.g. F1 0.837 vs 0.827), so the choices m
 <p>Full tables: {repo("reports/final_test_headline.csv")}, {repo("reports/final_test_pd.csv")}, {repo("reports/final_test_rate.csv")}, {repo("reports/final_test_errors_by_segment.csv")}; code: {nb("11_final_test.ipynb")}. The confusion-matrix counts below are recomputed in {nb("13_website_checks.ipynb")}.</p>
 
 <h3>Baselines: what if we used no model?</h3>
+<p class="src">Source: {nb("11_final_test.ipynb")}</p>
 <p>A score only means something next to the simplest possible answer. Each baseline below uses no information about the
 applicant at all:</p>
 <div class="table-wrap"><table>
@@ -507,6 +520,7 @@ every defaulter by 0.781: 0.219 × 0.781 = 0.171.</td><td class="num">Brier 0.05
 <p><b>What it tells us:</b> every pipeline is far better than guessing. Even Pipeline B's Brier score is half the baseline's.</p>
 
 <h3>95% intervals: is the gap between A and B real?</h3>
+<p class="src">Source: {nb("11_final_test.ipynb")} (<code>bootstrap_ci</code>, 1,000 resamples)</p>
 <p>The test set is one sample of 6,482 applicants; another sample would give slightly different scores. To measure this we used
 a <b>bootstrap</b>: draw 6,482 applicants from the test set <i>with replacement</i> (some appear twice, some not at all),
 recompute F1, and repeat 1,000 times. The middle 95% of those values is the interval: the range in which the score would
@@ -516,6 +530,7 @@ intervals do not overlap and the gap is real, not luck</b>: the grade really hel
 completely, so knowing the rate on top of the grade adds nothing measurable.</p>
 
 <h3>Confusion matrices and reliability diagram</h3>
+<p class="src">Source: {nb("11_final_test.ipynb")}; counts recomputed in {nb("13_website_checks.ipynb")}</p>
 {fig("test_confusion_reliability", "Test set: confusion matrices at the frozen cutoffs (left three) and the reliability diagram (right).")}
 <p><b>How to read a confusion matrix.</b> It counts the four possible outcomes of the approve/decline decision. Rows are what
 actually happened, columns are the model's decision at its frozen cutoff; "% of row" is the share of that actual group.</p>
@@ -571,6 +586,7 @@ never improves F1. For rates, all five regressors are within 0.02 R² of each ot
 matters far more than the choice of regressor.</div>
 
 <h2>Interest rates on the test set</h2>
+<p class="src">Source: {nb("11_final_test.ipynb")}; table: {repo("reports/final_test_rate.csv")}</p>
 {fig("test_rate_scatter", "Predicted vs actual rate on the test set, one dot per applicant.")}
 <p><b>How to read it.</b> Each dot is one test applicant: x = the rate they were actually charged, y = the rate our model
 suggests. A perfect model would put every dot on the dotted diagonal.</p>
@@ -640,6 +656,7 @@ these are the frozen models' saved predictions.</p>
 </ul></div>
 
 <h2>1. Move the decision cutoff</h2>
+<p class="src">Source: test-set PDs from {nb("11_final_test.ipynb")}, exported by {repo("src/export_site_data.py")}</p>
 <p>An applicant is declined when their PD is at or above the cutoff. Lower it to catch more defaulters (but decline more good
 customers); raise it for the opposite. The dashed line marks the cutoff chosen on the training set.</p>
 <div class="controls">
@@ -657,6 +674,7 @@ customers); raise it for the opposite. The dashed line marks the cutoff chosen o
 <p id="cutStory" class="note"></p>
 
 <h2>2. Browse real test applicants</h2>
+<p class="src">Source: test-set predictions from {nb("11_final_test.ipynb")}, exported by {repo("src/export_site_data.py")}</p>
 <p>Filter, then click an applicant to see what each model decided, the suggested rates, and what really happened.</p>
 <div class="controls">
 <label>Show <select id="fType">
@@ -710,7 +728,7 @@ page("analysis.html", "Result analysis", "<h1>Result analysis: why the results l
      + why("2. Trees and forests beat straight-line models",
            "In cross-validation on the training set (Reference setting), the tree models clearly beat the straight-line (linear) models at predicting default: Random Forest F1 0.830 and a single decision tree 0.813, against about 0.68 for logistic regression and the linear SVM.",
            "Default risk here follows yes/no rules that <b>combine</b> features, for example \"renting <b>and</b> borrowing more than about 31% of income\". A linear model gives each feature its own fixed weight and adds them up, so it cannot express \"only when both are true\". A tree asks a sequence of yes/no questions, so it captures such combinations directly.",
-           "In a depth-3 tree (below), applicants who rent and borrow more than ~31% of their income (7.2% of all applicants) <b>all</b> defaulted. The best linear model still misclassifies about 13% of training applicants whatever its margin setting C (notebook 02, Step 5).",
+           f"In a depth-3 tree (below, {nb('03_decision_trees.ipynb', 'nb 03')}), applicants who rent and borrow more than ~31% of their income (7.2% of all applicants) <b>all</b> defaulted. The best linear model still misclassifies about 13% of training applicants whatever its margin setting C ({nb('02_probability_of_default.ipynb', 'nb 02')}, Step 5). Model scores: {nb('05_random_forest.ipynb', 'nb 05')}, {nb('10_results_summary.ipynb', 'nb 10')}.",
            "Default in this data depends on combinations of conditions, which trees capture and straight lines cannot.",
            fig("tree_depth3", "Depth-3 decision tree on the training set. Each box is a yes/no question; numeric thresholds are on the standardised scale (1.26 ≈ loan above 31% of income). Bottom-right leaf: renters with a high loan-to-income, 100% default."))
      + why("3. A forest of trees beats a single tree",
@@ -747,10 +765,10 @@ Try it: on the <a href="explore.html">Explore</a> tab choose "defaulters the cho
      + why("7. The data's pricing looks real, but its default rates look extreme",
            "Two things in the data do not fit together. The interest rates look like real lending: they rise steadily from grade A to G. But the default rates are extreme: 21.9% of all loans and 98% of grade G loans defaulted.",
            "A lender who charges about 20% interest to a group where 98% default loses almost the whole loan on nearly everyone; no real lender could keep doing that. Real data is also messy, while this data contains rules with no exceptions at all. Both suggest the dataset is partly simulated, or describes an unusually risky group of borrowers.",
-           """<ul style="margin:0;padding-left:18px">
+           f"""<ul style="margin:0;padding-left:18px">
 <li><b>Pricing looks real.</b> World Bank check: the <b>premium</b> (interest rate minus the US prime rate, i.e. what a borrower pays above the rate for the safest customers) rises steadily from +3.5 pp (grade A) to +16.4 pp (grade G), as in real risk-based lending.</li>
 <li><b>Defaults look extreme.</b> Default rates by grade (calculated from the data, not predicted; 29,315 cleaned loans with a recorded rate): A 10%, B 16%, C 21%, then D 59%, E 65%, F 70%, G 98%.</li>
-<li><b>Rules without exceptions.</b> Every applicant who rents and borrows over ~31% of income defaulted (about 1,870 people); grades A and B contain <b>no</b> applicant with a past default, while C–G contain about 50%.</li></ul>""",
+<li><b>Rules without exceptions.</b> Every applicant who rents and borrows over ~31% of income defaulted (about 1,870 people); grades A and B contain <b>no</b> applicant with a past default, while C–G contain about 50%.</li></ul>Sources: {nb('12_macro_check.ipynb', 'nb 12')} (World Bank premiums), {nb('13_website_checks.ipynb', 'nb 13')} (default rates, rule counts).""",
            "The pricing is realistic, but the default pattern is too clean and too extreme to be typical; our high scores may not carry over to real lending data.",
            fig("premium_by_grade_data", "Premium over the US benchmark by grade (boxes, calculated from the data) and each grade's actual default rate (red line).", 760))
      + """<div class="note warn"><b>What this means for the conclusions.</b> Clean, rule-like data is easy for tree models to learn,

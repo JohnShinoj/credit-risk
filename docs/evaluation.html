@@ -19,6 +19,7 @@ decision is made):<br>
 <a href="index.html#why-three">Why we compare all three →</a></div>
 
 <h2>Split, cross-validation and the test set</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01_clean_split.ipynb</a> (split); <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>make_cv</code>); <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a> (test)</p>
 <pre style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px">
 32,409 applicants
 ├── TEST 20% (6,482) ───────────── locked; used once, in notebook 11, after every choice was frozen
@@ -36,6 +37,7 @@ decision is made):<br>
 </ul>
 
 <h2>Choosing the decision cutoff</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>f1_curve</code>, <code>best_cutoff</code>); worked example in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02_probability_of_default.ipynb</a></p>
 <p>A model says "default" when its PD is at or above a <b>cutoff</b>. The default 0.5 is not best when only 22% default. We
 tried <b>every distinct out-of-fold score</b> as the cutoff (an exact search, ~25,000 candidates) and kept the one with the highest F1,
 then checked it beat 0.5 in each fold. The chosen cutoffs are about 0.37–0.39 on the calibrated PD scale.

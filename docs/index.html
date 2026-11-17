@@ -27,6 +27,7 @@ what the lender already knows about the applicant.</p>
 
 <div class="card">
 <h3 style="margin-top:0">How a decision is made</h3>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a> (decisions on the test set); cutoff search: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>best_cutoff</code>)</p>
 <pre style="background:#f7f7f5;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px;margin:6px 0 10px">
 applicant ──► model ──► probability of default (PD), e.g. 0.12
                               │
@@ -81,6 +82,7 @@ prediction is made. That is why we built three settings:</p>
 <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">notebook 10</a> collects every validation result.</p>
 
 <h2 id="why-three">Why compare all three?</h2>
+<p class="src">Source: pipelines in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">nb 06</a>–<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09</a>; two-stage grade model: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07_interest_rate_regression.ipynb</a></p>
 <p>A lender meets applicants at different stages, and what is known about them differs. Each pipeline answers the question
 for one stage, and each has a clear role:</p>
 <div class="table-wrap"><table>
@@ -119,6 +121,7 @@ it is where all the models were first compared before the choice was confirmed i
 </div>
 
 <h2>Headline results (final test set, used once)</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11_final_test.ipynb</a>; table: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/final_test_headline.csv" target="_blank" rel="noopener">reports/final_test_headline.csv</a></p>
 <div class="grid three">
 <div class="card kpi"><span class="tag ref">Reference</span><div class="v">0.838</div><div class="l">default F1 (Random Forest)<br>Brier 0.052 · ROC-AUC 0.942</div></div>
 <div class="card kpi"><span class="tag A">Pipeline A</span><div class="v">0.837 · R² 0.907</div><div class="l">default F1 · interest-rate R²<br>rate error ±0.99 pp</div></div>

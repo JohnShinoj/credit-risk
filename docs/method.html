@@ -19,6 +19,7 @@ decision is made):<br>
 <a href="index.html#why-three">Why we compare all three →</a></div>
 
 <h2>Preprocessing, and why</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>make_preprocess</code>, <code>make_pipeline</code>)</p>
 <div class="table-wrap"><table>
 <tr><th>Step</th><th>Applied to</th><th>Why</th></tr>
 <tr><td>Median imputation</td><td>employment length, interest rate (where it is an input)</td><td>fills gaps without being pulled by extreme values (income and loan amounts are right-skewed)</td></tr>
@@ -57,6 +58,7 @@ one cross-validation round (repeated 5 times, each fold used once for validation
 </table></div>
 
 <h2>Models for default (classification)</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">nb 02</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08</a>; all scores: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/all_classification_scores.csv" target="_blank" rel="noopener">reports/all_classification_scores.csv</a></p>
 <p>The same five model types were compared in <b>all three settings</b> (Reference: notebooks 02, 03, 05; Pipeline A: notebook 08;
 Pipeline B: notebook 06), each re-tuned for its own inputs.</p>
 <div class="table-wrap"><table>
@@ -78,6 +80,7 @@ that fold's outcomes. The version with the lowest Brier score was kept (<a href=
 <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06_applicant_only_models.ipynb</a>, <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08_graded_applicant_models.ipynb</a>).</p>
 
 <h2>Models for the interest rate (regression)</h2>
+<p class="src">Source: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">nb 07</a> (Pipeline B), <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">nb 09</a> (Pipeline A); all scores: <a href="https://github.com/JohnShinoj/credit-risk/blob/main/reports/all_rate_scores.csv" target="_blank" rel="noopener">reports/all_rate_scores.csv</a></p>
 <div class="table-wrap"><table>
 <tr><th>Model</th><th>Role</th><th>Tuned</th></tr>
 <tr><td>Predict the average rate</td><td>floor: anything useful must beat it</td><td>-</td></tr>
@@ -92,6 +95,7 @@ as extra inputs. Out-of-fold, so no leakage. Result: R² 0.303 vs 0.305 without 
 </table></div>
 
 <h2>What each setting may use</h2>
+<p class="src">Source: input lists in <a href="https://github.com/JohnShinoj/credit-risk/blob/main/src/credit.py" target="_blank" rel="noopener">src/credit.py</a> (<code>NUM_COLS</code>, <code>APPLICANT_NUM_COLS</code>, ...)</p>
 <div class="table-wrap"><table>
 <tr><th>Setting</th><th>Default-model inputs</th><th>Rate-model inputs</th></tr>
 <tr><td><span class="tag ref">Reference</span></td><td>details + grade + rate</td><td>none (rate known)</td></tr>

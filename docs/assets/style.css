@@ -84,3 +84,4 @@ footer { max-width: var(--maxw); margin: 0 auto; padding: 16px; color: var(--mut
 .pager a { text-decoration: none; border: 1px solid var(--line); background: var(--panel); padding: 8px 14px; border-radius: 8px; }
 code { background: #eef0f2; padding: 1px 5px; border-radius: 4px; font-size: 90%; }
 ol li, ul li { margin: 4px 0; }
+.src { font-size: 13px; color: var(--muted); margin: 2px 0 12px; }
