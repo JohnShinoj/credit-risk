@@ -1,0 +1,13 @@
+,Reference (rate + grade),Pipeline A (grade),Pipeline B (newcomer)
+known when deciding,rate + grade,grade,nothing (newcomer)
+PD model,Random Forest,Random Forest,Random Forest
+PD cutoff,n/a (reference),0.367,0.388
+PD F1,0.8298012357927919,0.826939809130096,0.6908371358997414
+PD precision,0.9552926102974515,0.9509913722393915,0.8204403918647255
+PD recall,0.733509700176367,0.7315696649029982,0.5968253968253969
+PD ROC-AUC,0.9342415455714415,0.9336481774771308,0.8823649495877047
+PD Brier,0.0556,0.05638045782807401,0.0879303312991344
+rate model,none (rate known),Random Forest regressor,Random Forest regressor
+rate inputs,-,grade + details,PD + details
+rate RMSE (pp),,0.9967946434165345,2.702180549804529
+rate R²,,0.9053795264870764,0.30490851606301517
