@@ -36,12 +36,29 @@ one cross-validation round (repeated 5 times, each fold used once for validation
                           ▼
   1 validation fold ── impute → scale → one-hot ──────────► predict → score (F1 / RMSE)</pre>
 
+<h2>Where each pipeline is in the code</h2>
+<div class="table-wrap"><table>
+<tr><th>Setting</th><th>Default models (classification + PD)</th><th>Interest-rate models (regression)</th></tr>
+<tr><td><span class="tag ref">Reference</span> rate + grade</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/02_probability_of_default.ipynb" target="_blank" rel="noopener">02</a> logistic regression, SMOTE, linear and RBF SVM ·
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/03_decision_trees.ipynb" target="_blank" rel="noopener">03</a> decision tree · <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/05_random_forest.ipynb" target="_blank" rel="noopener">05</a> Random Forest ·
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/04_probability_of_default.ipynb" target="_blank" rel="noopener">04</a> calibrated PD for every model</td><td>none (rate already known)</td></tr>
+<tr><td><span class="tag A">Pipeline A</span> grade</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/08_graded_applicant_models.ipynb" target="_blank" rel="noopener">08</a> all five model types, re-tuned, calibrated PD</td>
+<td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/09_interest_rate_with_grade.ipynb" target="_blank" rel="noopener">09</a> linear, Ridge, Lasso, Random Forest, gradient boosting</td></tr>
+<tr><td><span class="tag B">Pipeline B</span> newcomer</td><td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/06_applicant_only_models.ipynb" target="_blank" rel="noopener">06</a> all five model types, re-tuned, calibrated PD</td>
+<td><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/07_interest_rate_regression.ipynb" target="_blank" rel="noopener">07</a> linear, Ridge, Lasso, Random Forest, gradient boosting, two-stage grade model</td></tr>
+<tr><td>All three</td><td colspan="2"><a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/01_clean_split.ipynb" target="_blank" rel="noopener">01</a> cleaning and split ·
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/10_results_summary.ipynb" target="_blank" rel="noopener">10</a> all validation results · <a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/11_final_test.ipynb" target="_blank" rel="noopener">11</a> final test set ·
+<a href="https://github.com/JohnShinoj/credit-risk/blob/main/notebooks/12_macro_check.ipynb" target="_blank" rel="noopener">12</a> World Bank check · shared code in <code>src/credit.py</code></td></tr>
+</table></div>
+
 <h2>Models for default (classification)</h2>
+<p>The same five model types were compared in <b>all three settings</b> (Reference: notebooks 02, 03, 05; Pipeline A: notebook 08;
+Pipeline B: notebook 06), each re-tuned for its own inputs.</p>
 <div class="table-wrap"><table>
 <tr><th>Model</th><th>Role</th><th>Why it fits</th><th>Tuned</th></tr>
-<tr><td>Logistic regression</td><td><b>baseline</b></td><td>simple, interpretable, gives probabilities; a straight-line (linear) boundary</td><td>C (regularisation)</td></tr>
+<tr><td>Logistic regression</td><td><b>baseline</b></td><td>simple, interpretable, gives probabilities; a straight-line (linear) boundary</td><td>C (regularisation) in Pipelines A and B; default C in Reference</td></tr>
 <tr><td>Soft-margin linear SVM</td><td>extra</td><td>widest-margin straight boundary; shows the maximal-margin idea and its limits</td><td>C</td></tr>
-<tr><td>SVM with RBF kernel</td><td>candidate</td><td>curved boundaries, captures interactions between features</td><td>C, γ (grid on an 8,000-row subset, confirmed on all rows)</td></tr>
+<tr><td>SVM with RBF kernel</td><td>candidate</td><td>curved boundaries, captures interactions between features</td><td>C, γ (grid on an 8,000-row subset; the top 2 confirmed on all rows in Reference, the winner scored on all rows in A and B)</td></tr>
 <tr><td>Decision tree</td><td>extra</td><td>yes/no rules (thresholds), readable</td><td>depth, leaf size, criterion</td></tr>
 <tr><td>Random Forest</td><td>candidate</td><td>averages 300 trees on bootstrap samples with random features per split, which cuts the variance of single trees</td><td>depth, leaf size, max_features, criterion (randomized search)</td></tr>
 </table></div>
